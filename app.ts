@@ -38,7 +38,7 @@ export class App {
   static async create(env: Env): Promise<App> {
     const app = new App(env);
 
-    // await initDB();
+    await initDB();
     app.initUtils()
     app.initControllers();
     app.initErrorHandling();
