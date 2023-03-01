@@ -1,0 +1,37 @@
+name: Test Push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - name: Check Node
+        run: node --version
+      - name: Check NPM
+        run: npm --version
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Deps
+        run: npm ci
+      - name: Build
+        run: npm run prod
+  lint:
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - name: Check Node
+        run: node --version
+      - name: Check NPM
+        run: npm --version
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Deps
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+        
