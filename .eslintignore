@@ -1,2 +1,3 @@
 /src/modules/models/*.ts
 /src/middleware/asyncHandler.ts
+/webpack.config.js
