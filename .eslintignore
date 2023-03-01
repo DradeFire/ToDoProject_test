@@ -1,2 +1,2 @@
-/modules/models/*.ts
-/middleware/asyncHandler.ts
+/src/modules/models/*.ts
+/src/middleware/asyncHandler.ts
