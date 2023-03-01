@@ -1,7 +1,7 @@
 import { App } from "./app";
 import CurrentEnv, { Env } from "./utils/env-config";
 
-async //function startApp(env: Env) {
+async function startApp(env: Env) {
     let app: App
 
     switch (env) {

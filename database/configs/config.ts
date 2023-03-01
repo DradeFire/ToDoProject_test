@@ -2,7 +2,7 @@ import { Dialect } from "sequelize";
 
 class Config {
   static dialect: Dialect = 'postgres'
-  static host = "localhost" //"db_auth"
+  static host = "db_auth"
   static username = "postgres"
   static password = "1358"
 }
