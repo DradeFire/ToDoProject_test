@@ -8,57 +8,18 @@ on:
 
 
 jobs:
-  build:   
-    runs-on: ubuntu-latest
-    container: node:18
-
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_DB: tasktracker_prod        
-          POSTGRES_PASSWORD: 1358
-          POSTGRES_PORT: 5432
-          POSTGRES_USER: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-      - name: Check Node
-        run: node --version
-      - name: Check NPM
-        run: npm --version
-      - name: Deps
-        run: npm ci
-      - name: TypeScript Dep
-        run: npm install -g ts-node
-      - name: Build
-        run: npm run prod
   lint:
     runs-on: ubuntu-latest
     container: node:18
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
       - name: Check Node
         run: node --version
       - name: Check NPM
         run: npm --version
       - name: Deps
         run: npm ci
-      - name: TypeScript Dep
-        run: npm install -g ts-node
       - name: Lint
         run: npm run lint
         
