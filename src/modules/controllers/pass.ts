@@ -1,12 +1,12 @@
 import User from "../../database/model/User";
 import bcrypt from "bcryptjs";
-import { ErrorResponse } from "../../middleware/custom-error";
 import { Response } from 'express';
 import { UserRequest, ChangePassRequest, RecoverPassRequest } from '../models/models';
 import { ErrorReasons, JWT_SECRET, OkMessage, StatusCode, Transporter, UrlConst } from "../../utils/constants";
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
-import CurrentEnv, { Env } from "../../utils/env-config";
+import CurrentEnv, { Env } from "../../utils/env_config";
+import { ErrorResponse } from "../../middleware/custom-error";
 
 
 function getCurrentPort(): number {

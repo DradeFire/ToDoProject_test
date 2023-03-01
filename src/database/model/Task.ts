@@ -50,4 +50,4 @@ Task.init(
   }
 );
 
-export = Task;
+export default Task;

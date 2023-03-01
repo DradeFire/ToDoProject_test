@@ -1,5 +1,5 @@
 import { App } from "./app";
-import CurrentEnv, { Env } from "./utils/env-config";
+import CurrentEnv, { Env } from "./utils/env_config";
 
 async function startApp(env: Env) {
     let app: App

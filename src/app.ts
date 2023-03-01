@@ -2,15 +2,15 @@ import express, { Application } from "express";
 import { authRoutes } from "./routers/auth";
 import { taskRoutes } from "./routers/tasks";
 import { initDB } from "./database/db/db";
-import { Env } from "./utils/env-config";
-import { asyncHandler } from "./middleware/asyncHandler";
-import { errorHandler } from "./middleware/errorHandler";
-import { notFound } from "./middleware/notFoundHandler";
-import { requireToken } from "./middleware/requireToken";
+import { Env } from "./utils/env_config";
 import { UrlConst } from "./utils/constants";
 import { groupRoutes } from "./routers/group";
 import cors from "cors";
 import { profileRoutes } from "./routers/profile";
+import { notFound } from "./middleware/notFoundHandler";
+import { errorHandler } from "./middleware/errorHandler";
+import { requireToken } from "./middleware/requireToken";
+import { asyncHandler } from "./middleware/asyncHandler";
 
 export class App {
   private app: Application;

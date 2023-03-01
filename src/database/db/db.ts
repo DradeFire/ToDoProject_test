@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
 import { createNamespace } from "cls-hooked";
 import { Dev_Config, PROD_Config, TEST_Config } from "../configs/config";
-import CurrentEnv, { Env } from "../../utils/env-config";
+import CurrentEnv, { Env } from "../../utils/env_config";
 
 const namespace = createNamespace("ns");
 Sequelize.useCLS(namespace);

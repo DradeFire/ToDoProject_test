@@ -36,4 +36,4 @@ RoleGroup.init(
   }
 );
 
-export = RoleGroup;
+export default RoleGroup;

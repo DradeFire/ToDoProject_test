@@ -2,10 +2,10 @@ import User from "../../database/model/User";
 import { Token } from "../../database/model/Token";
 import { nanoid } from "nanoid";
 import bcrypt from "bcryptjs";
-import { ErrorResponse } from "../../middleware/custom-error";
 import { Response } from 'express';
 import { UserRequest } from '../models/models';
 import { ErrorReasons, OkMessage, StatusCode } from "../../utils/constants";
+import { ErrorResponse } from "../../middleware/custom-error";
 
 const login = async (req: UserRequest, res: Response) => {
   if (!req.body.email) {

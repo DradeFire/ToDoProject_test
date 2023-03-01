@@ -31,4 +31,4 @@ ToDoGroup.init(
   }
 );
 
-export = ToDoGroup;
+export default ToDoGroup;

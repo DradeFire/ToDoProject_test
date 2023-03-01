@@ -1,11 +1,12 @@
 {
-  "name": "task_tracker",
+  "name": "my_task_tracker",
   "version": "2.0.0",
   "main": "index.ts",
   "scripts": {
     "dev": "nodemon index.ts",
     "prod": "ts-node index.ts",
-    "lint": "npx eslint ."
+    "lint": "npx eslint .",
+    "build": "webpack"
   },
   "author": "Drade Fire",
   "license": "ISC",
@@ -23,7 +24,10 @@
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "pg": "^8.8.0",
-    "sequelize": "^6.25.1"
+    "sequelize": "^6.29.0",
+    "webpack": "^5.75.0",
+    "webpack-dev-server": "^4.11.1",
+    "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
@@ -41,7 +45,9 @@
     "eslint-plugin-n": "^15.6.1",
     "eslint-plugin-promise": "^6.1.1",
     "nodemon": "^2.0.20",
-    "typescript": "^4.9.5"
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.5",
+    "webpack-cli": "^5.0.1"
   },
   "keywords": [],
   "description": ""
