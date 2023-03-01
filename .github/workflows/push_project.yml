@@ -8,6 +8,23 @@ on:
 
 
 jobs:
+  build:   
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+      - name: Check Node
+        run: node --version
+      - name: Check NPM
+        run: npm --version
+      - name: Deps
+        run: npm ci
+      - name: Build
+        run: npm run build
+        
   lint:
     runs-on: ubuntu-latest
     container: node:18
