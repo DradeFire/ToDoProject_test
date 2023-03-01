@@ -1,0 +1,31 @@
+version: '2.1'
+
+services:
+  app:
+    build: .
+    ports:
+      - 3000:3000
+    depends_on:
+      db_auth:
+        condition: service_healthy
+    links:
+      - db_auth
+  db_auth:
+    container_name: db_auth
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=1358
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=tasktracker_prod
+    image: postgres:14.3-alpine
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      
+volumes:
+  database:
