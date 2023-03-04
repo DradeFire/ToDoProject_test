@@ -1,10 +1,12 @@
-import { Token } from "../../database/model/Token"
 import { Request } from "express"
+import Token from "../../database/model/final/Token"
+import User from "../../database/model/final/User"
 import { UserModel, ToDoModel, ChangePassModel, IdParamModel, RecoverPassModel, ToDoGroupModel, RoleGroupModel } from "../dto/models"
 
 
 export interface RequestWithToken<ReqBody> extends Request<IdParamModel, {}, ReqBody, {}> {
     token: Token
+    user: User
 }
 
 

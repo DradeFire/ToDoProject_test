@@ -1,13 +1,13 @@
-import User from "../../database/model/User";
-import { Token } from "../../database/model/Token";
 import { nanoid } from "nanoid";
 import bcrypt from "bcryptjs";
 import { Response } from 'express';
 import { UserRequest } from '../models/models';
 import { ErrorReasons, OkMessage, StatusCode } from "../../utils/constants";
 import { ErrorResponse } from "../../middleware/custom-error";
+import User from "../../database/model/final/User";
+import Token from "../../database/model/final/Token";
 
-const login = async (req: UserRequest, res: Response) => {
+export const login = async (req: UserRequest, res: Response) => {
   if (!req.body.email) {
     throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
@@ -15,14 +15,18 @@ const login = async (req: UserRequest, res: Response) => {
     throw new ErrorResponse(ErrorReasons.PASSWORD_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
 
-  const candidate = await User.findByPk(req.body.email);
+  const candidate = await User.findOne({
+    where: {
+      email: req.body.email
+    }
+  });
   if (!candidate) {
     throw new ErrorResponse(ErrorReasons.INCORRECT_LOGIN_400, StatusCode.BAD_REQUEST_400);
   }
 
   const passwordResult = bcrypt.compareSync(
     req.body.pass,
-    candidate.pass as string
+    candidate.pass
   );
 
   if (!passwordResult) {
@@ -34,10 +38,10 @@ const login = async (req: UserRequest, res: Response) => {
     value: nanoid(128),
   });
 
-  res.json(newToken);
+  res.json(newToken.toJSON());
 };
 
-const registration = async (req: UserRequest, res: Response) => {
+export const registration = async (req: UserRequest, res: Response) => {
   if (!req.body.email) {
     throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
@@ -47,8 +51,15 @@ const registration = async (req: UserRequest, res: Response) => {
   if (!req.body.firstName) {
     throw new ErrorResponse(ErrorReasons.FIRSTNAME_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
+  if (!req.body.birthDate) {
+    throw new ErrorResponse(ErrorReasons.BIRTHDATE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
+  }
 
-  const candidate = await User.findByPk(req.body.email);
+  const candidate = await User.findOne({
+    where: {
+      email: req.body.email
+    }
+  });
   if (candidate) {
     throw new ErrorResponse(ErrorReasons.USER_EMAIL_EXIST_400, StatusCode.BAD_REQUEST_400);
   }
@@ -59,25 +70,18 @@ const registration = async (req: UserRequest, res: Response) => {
   const user = await User.create({
     email: req.body.email,
     pass: hashPassword,
-    firstName: req.body.firstName
+    firstName: req.body.firstName,
+    birthDate: req.body.birthDate
   });
 
   res.json(user.toJSON());
 };
 
-const logout = async (req: UserRequest, res: Response) => {
+export const logout = async (req: UserRequest, res: Response) => {
   await req.token.destroy();
   res.json(OkMessage);
 };
 
-const me = async (req: UserRequest, res: Response) => {
-  const user = await User.findByPk(req.token.userEmail);
-  res.json(user?.toJSON());
-};
-
-export {
-  login,
-  registration,
-  logout,
-  me,
+export const me = async (req: UserRequest, res: Response) => {
+  res.json(req.user.toJSON());
 };

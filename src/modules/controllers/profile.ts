@@ -1,69 +1,62 @@
 import { Response } from "express";
-import RoleGroup from "../../database/model/RoleGroup";
-import Task from "../../database/model/Task";
-import ToDoGroup from "../../database/model/ToDoGroup";
-import User from "../../database/model/User";
+import MMUserToDo from "../../database/model/relations/MMUserToDo";
+import MMUserToDoGroup from "../../database/model/relations/MMUserToDoGroup";
 import { ErrorResponse } from "../../middleware/custom-error";
 import { ErrorReasons, OkMessage, StatusCode } from "../../utils/constants";
 import { UserRequest } from "../models/models";
 
-const updateProfile = async (req: UserRequest, res: Response) => {
-    if (!req.body.email) {
-        throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-    }
+export const updateProfile = async (req: UserRequest, res: Response) => {
     if (!req.body.firstName) {
         throw new ErrorResponse(ErrorReasons.FIRSTNAME_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
     }
-
-    const candidateWithEmail = await User.findByPk(req.body.email);
-    if (candidateWithEmail) {
-        throw new ErrorResponse(ErrorReasons.USER_EMAIL_EXIST_400, StatusCode.BAD_REQUEST_400);
+    if (!req.body.birthDate) {
+        throw new ErrorResponse(ErrorReasons.BIRTHDATE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
     }
 
-    const candidate = await User.findByPk(req.token.userEmail);
-    if (!candidate) {
-        throw new ErrorResponse(ErrorReasons.INCORRECT_LOGIN_400, StatusCode.BAD_REQUEST_400);
-    }
-
-    await candidate.update({
-        email: req.body.email,
+    await req.user.update({
+        birthDate: req.body.birthDate,
         firstName: req.body.firstName
     });
 
     res.json(OkMessage);
 }
 
-const deleteProfile = async (req: UserRequest, res: Response) => {
-    const candidate = await User.findByPk(req.token.userEmail);
-    if (!candidate) {
-        throw new ErrorResponse(ErrorReasons.INCORRECT_LOGIN_400, StatusCode.BAD_REQUEST_400);
-    }
-
-    const groupList = await ToDoGroup.findAll({
+export const deleteProfile = async (req: UserRequest, res: Response) => {
+    const groupIdList = await MMUserToDoGroup.findAll({
         where: {
-            ownerEmail: req.token.userEmail
+            userId: req.user.id,
+            role: "read-write"
         },
     });
 
-    await groupList.forEach(async (val, _index, _array) => {
-        await Task.destroy({
+    groupIdList.forEach(async (val, _index, _arr) => {
+        const groupUserList = await MMUserToDoGroup.findAll({
             where: {
-                group: val.title
-            },
+                groupId: val.groupId,
+                role: "read-write"
+            }
         });
-
-        await RoleGroup.destroy({
-            where: {
-                groupTitle: val.title
-            },
-        });
+        if (groupUserList.length == 1) {
+            // TODO - удалить группу
+        }
     });
 
+    const taskIdList = await MMUserToDo.findAll({
+        where: {
+            userId: req.user.id
+        },
+    });
+
+    taskIdList.forEach(async (val, _index, _arr) => {
+        const taskIdList = await MMUserToDo.findAll({
+            where: {
+                taskId: val.taskId
+            }
+        });
+        if (taskIdList.length == 1) {
+            // TODO - удалить task
+        }
+    });
 
     res.json(OkMessage);
-}
-
-export {
-    updateProfile,
-    deleteProfile
 }

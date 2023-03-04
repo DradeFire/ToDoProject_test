@@ -1,10 +1,12 @@
-import Task from "../../database/model/Task";
 import { Response } from 'express';
 import { TaskRequest } from '../models/models';
 import { ErrorReasons, OkMessage, StatusCode } from '../../utils/constants'
 import { ErrorResponse } from "../../middleware/custom-error";
+import Task from '../../database/model/final/Task';
+import MMUserFavouriteToDo from '../../database/model/relations/MMUserFavouriteToDo';
+import MMUserToDo from '../../database/model/relations/MMUserToDo';
 
-const create = async (req: TaskRequest, res: Response) => {
+export const create = async (req: TaskRequest, res: Response) => {
   if (!req.body.title) {
     throw new ErrorResponse(ErrorReasons.TITLE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
@@ -19,17 +21,34 @@ const create = async (req: TaskRequest, res: Response) => {
   }
 
   const task = await Task.create({
-    userEmail: req.token.userEmail,
     title: req.body.title,
     description: req.body.description,
     isCompleted: req.body.isCompleted,
-    favourite: req.body.favourite,
+  });
+
+  if (req.body.favourite) {
+    await MMUserFavouriteToDo.create({
+      userId: req.user.id,
+      taskId: task.id
+    });
+  } else {
+    await MMUserFavouriteToDo.destroy({
+      where: {
+        userId: req.user.id,
+        taskId: task.id
+      }
+    })
+  }
+
+  await MMUserToDo.create({
+    userId: req.user.id,
+    taskId: task.id
   });
 
   res.json(task);
 };
 
-const update = async (req: TaskRequest, res: Response) => {
+export const update = async (req: TaskRequest, res: Response) => {
   if (!req.body.title) {
     throw new ErrorResponse(ErrorReasons.TITLE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
@@ -46,39 +65,68 @@ const update = async (req: TaskRequest, res: Response) => {
   const task = await Task.findOne({
     where: {
       id: req.params.id,
-      userEmail: req.token.userEmail,
     },
   });
 
   if (!task) {
     throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
+  }
+
+  const isUserOwner = await MMUserToDo.findOne({
+    where: {
+      userId: req.user.id,
+      taskId: task.id
+    }
+  })
+
+  if (!isUserOwner) {
+    throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
   }
 
   await task.update({
     title: req.body.title,
     description: req.body.description,
     isCompleted: req.body.isCompleted,
-    favourite: req.body.favourite,
   });
+
+  if (req.body.favourite) {
+    await MMUserFavouriteToDo.create({
+      userId: req.user.id,
+      taskId: task.id
+    });
+  } else {
+    await MMUserFavouriteToDo.destroy({
+      where: {
+        userId: req.user.id,
+        taskId: task.id
+      }
+    })
+  }
 
   res.json(OkMessage);
 };
 
-const getAll = async (req: TaskRequest, res: Response) => {
-  const taskList = await Task.findAll({
+export const getAll = async (req: TaskRequest, res: Response) => {
+  const idList = await MMUserToDo.findAll({
     where: {
-      userEmail: req.token.userEmail,
-    },
+      userId: req.user.id
+    }
+  })
+
+  const taskList = Array<Task>(idList.length)
+
+  idList.forEach(async (val, index, _arr) => {
+    const tmp = await Task.findByPk(val.taskId);
+    taskList[index] = tmp!;
   });
 
   res.json({ taskList });
 };
 
-const getById = async (req: TaskRequest, res: Response) => {
+export const getById = async (req: TaskRequest, res: Response) => {
   const task = await Task.findOne({
     where: {
       id: req.params.id,
-      userEmail: req.token.userEmail,
     },
   });
 
@@ -86,19 +134,40 @@ const getById = async (req: TaskRequest, res: Response) => {
     throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
   }
 
+  const isUserOwner = await MMUserToDo.findOne({
+    where: {
+      userId: req.user.id,
+      taskId: req.params.id
+    }
+  })
+
+  if (!isUserOwner) {
+    throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
+  }
+
   res.json(task);
 };
 
-const deleteById = async (req: TaskRequest, res: Response) => {
+export const deleteById = async (req: TaskRequest, res: Response) => {
   const task = await Task.findOne({
     where: {
       id: req.params.id,
-      userEmail: req.token.userEmail,
     },
   });
 
   if (!task) {
     throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
+  }
+
+  const isUserOwner = await MMUserToDo.findOne({
+    where: {
+      userId: req.user.id,
+      taskId: req.params.id
+    }
+  })
+
+  if (!isUserOwner) {
+    throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
   }
 
   await task.destroy();
@@ -106,21 +175,18 @@ const deleteById = async (req: TaskRequest, res: Response) => {
   res.json(OkMessage);
 };
 
-const deleteAll = async (req: TaskRequest, res: Response) => {
-  await Task.destroy({
+export const deleteAll = async (req: TaskRequest, res: Response) => {
+  const idList = await MMUserToDo.findAll({
     where: {
-      userEmail: req.token.userEmail,
-    },
+      userId: req.user.id
+    }
+  })
+
+  idList.forEach(async (val, _index, _arr) => {
+    const task = await Task.findByPk(val.taskId);
+    task?.destroy();
   });
 
   res.json(OkMessage);
 };
 
-export {
-  create,
-  update,
-  getAll,
-  getById,
-  deleteById,
-  deleteAll,
-};

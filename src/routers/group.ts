@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { asyncHandler } from "../middleware/asyncHandler";
 import { createGroup, deleteGroup, updateGroup } from "../modules/controllers/group";
-import { addUser, deleteUser, updateRole, leaveGroup } from "../modules/controllers/group_role";
+import { addUser, deleteUser, updateRole, leaveGroup } from "../modules/controllers/group_user_manipulations";
 
 const groupRoutes = Router();
 

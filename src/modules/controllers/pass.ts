@@ -1,4 +1,3 @@
-import User from "../../database/model/User";
 import bcrypt from "bcryptjs";
 import { Response } from 'express';
 import { UserRequest, ChangePassRequest, RecoverPassRequest } from '../models/models';
@@ -7,6 +6,7 @@ import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
 import CurrentEnv, { Env } from "../../utils/env_config";
 import { ErrorResponse } from "../../middleware/custom-error";
+import User from "../../database/model/final/User";
 
 
 function getCurrentPort(): number {
@@ -24,17 +24,21 @@ function getCurrentPort(): number {
 }
 
 
-const resetPassword = async (req: UserRequest, res: Response) => {
+export const resetPassword = async (req: UserRequest, res: Response) => {
     const { email, token } = req.params;
 
-    const secret = JWT_SECRET + email
+    const secret = JWT_SECRET + req.body.email
     const payload = jwt.verify(token, secret)
 
     // if (payload.email as string !== email) {
     //     throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
     // }
 
-    const candidate = await User.findByPk(email);
+    const candidate = await User.findOne({
+        where: {
+            email: email
+        }
+    });
     if (!candidate) {
         throw new ErrorResponse(ErrorReasons.INCORRECT_LOGIN_400, StatusCode.BAD_REQUEST_400);
     }
@@ -44,7 +48,7 @@ const resetPassword = async (req: UserRequest, res: Response) => {
     })
 };
 
-const resetPassSendMail = async (req: UserRequest, res: Response) => {
+export const resetPassSendMail = async (req: UserRequest, res: Response) => {
     if (!req.body.email) {
         throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
     }
@@ -85,7 +89,7 @@ const resetPassSendMail = async (req: UserRequest, res: Response) => {
     });
 };
 
-const recoverPass = async (req: RecoverPassRequest, res: Response) => {
+export const recoverPass = async (req: RecoverPassRequest, res: Response) => {
     if (!req.body.email) {
         throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
     }
@@ -100,7 +104,11 @@ const recoverPass = async (req: RecoverPassRequest, res: Response) => {
         throw new ErrorResponse(ErrorReasons.PASSWORDS_NOT_EQUAL_400, StatusCode.BAD_REQUEST_400)
     }
 
-    const candidate = await User.findByPk(req.body.email);
+    const candidate = await User.findOne({
+        where: {
+            email: req.body.email
+        }
+    });
 
     const salt = bcrypt.genSaltSync(10);
     await candidate?.update(
@@ -117,7 +125,7 @@ const recoverPass = async (req: RecoverPassRequest, res: Response) => {
     res.json(OkMessage);
 };
 
-const changePassword = async (req: ChangePassRequest, res: Response) => {
+export const changePassword = async (req: ChangePassRequest, res: Response) => {
     if (!req.body.lastPassword) {
         throw new ErrorResponse(ErrorReasons.PASSWORD_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
     }
@@ -128,19 +136,13 @@ const changePassword = async (req: ChangePassRequest, res: Response) => {
     const lastPassword = req.body.lastPassword;
     const newPassword = req.body.newPassword;
 
-    const candidate = await User.findByPk(req.token.userEmail);
-
-    if (!candidate) {
-        throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
-    }
-
-    const passwordResult = bcrypt.compareSync(lastPassword, candidate.pass as string);
+    const passwordResult = bcrypt.compareSync(lastPassword, req.user.pass as string);
     if (!passwordResult) {
         throw new ErrorResponse(ErrorReasons.INCORRECT_LAST_PASSWORD_400, StatusCode.BAD_REQUEST_400);
     }
 
     const salt = bcrypt.genSaltSync(10);
-    await candidate.update(
+    await req.user.update(
         {
             pass: bcrypt.hashSync(newPassword, salt),
         },
@@ -153,12 +155,3 @@ const changePassword = async (req: ChangePassRequest, res: Response) => {
 
     res.json(OkMessage);
 };
-
-export {
-    resetPassword,
-    resetPassSendMail,
-    recoverPass,
-    changePassword
-}
-
-

@@ -5,19 +5,18 @@ class Config {
   static host = "db_auth"
   static username = "postgres"
   static password = "1358"
+  static models = [__dirname + '../model/final/*.ts'/*, __dirname + '/models/relations/*.ts'*/]
+  static port = 5432
 }
 
 export class Dev_Config extends Config {
   static database = "tasktracker_dev"
-  static port = 5432
 }
 
 export class TEST_Config extends Config {
   static database = "tasktracker_test"
-  static port = 5432
 }
 
 export class PROD_Config extends Config {
   static database = "tasktracker_prod"
-  static port = 5432
 }

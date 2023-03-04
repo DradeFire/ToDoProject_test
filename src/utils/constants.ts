@@ -12,6 +12,7 @@ export class ErrorReasons {
     static EMAIL_NOT_SEND_400 = "Email not send"
     static PASSWORD_NOT_SEND_400 = "Password not send"
     static FIRSTNAME_NOT_SEND_400 = "Firstname not send"
+    static BIRTHDATE_NOT_SEND_400 = "Firstname not send"
     static TITLE_NOT_SEND_400 = "TItle not send"
     static DESCRIPTION_NOT_SEND_400 = "Description not send"
     static ISCOMPLITED_NOT_SEND_400 = "IsComplited not send"
@@ -49,8 +50,11 @@ export class DatabaseInfo {
     static USER_TABLE_NAME = 'users'
     static TOKEN_TABLE_NAME = 'tokens'
     static TASK_TABLE_NAME = 'tasks'
-    static ROLE_GROUP_TABLE_NAME = 'role_group'
-    static TODO_GROUP_TABLE_NAME = 'todo_group'
+    static GROUP_TABLE_NAME = 'group'
+    static USER_GROUP_TABLE_NAME = 'user_group'
+    static USER_TASK_TABLE_NAME = "user_task"
+    static USER_FAVOURITE_TASK_TABLE_NAME = "user__favourite_task"
+    static TASK_GROUP_TABLE_NAME = 'user_group'
 }
 
 export const JWT_SECRET = "1029384756qpwoeirutyalskdjfhgQWEASDZXC"

@@ -2,7 +2,7 @@ import { NextFunction, Response, Request } from "express";
 import { ErrorReasons, StatusCode } from "../utils/constants";
 import { ErrorResponse } from "./custom-error";
 
-const errorHandler = (err: ErrorResponse, _req: Request, res: Response, _next: NextFunction) => {
+export const errorHandler = (err: ErrorResponse, _req: Request, res: Response, _next: NextFunction) => {
     console.log(ErrorReasons.ERROR, {
         message: err.message,
         stack: err.stack,
@@ -12,7 +12,3 @@ const errorHandler = (err: ErrorResponse, _req: Request, res: Response, _next: N
         message: err.message,
     });
 };
-
-export {
-    errorHandler
-}
