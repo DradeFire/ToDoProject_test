@@ -9,7 +9,6 @@ export class ToDoModel {
     title: string | undefined
     description: string | undefined
     isCompleted: boolean | undefined
-    favourite: boolean | undefined
 }
 
 export class TokenModel {

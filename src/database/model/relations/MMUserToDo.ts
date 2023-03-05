@@ -12,4 +12,7 @@ export default class MMUserToDo extends Model {
 
   @Column
   public taskId!: number;
+
+  @Column
+  public role!: string;
 }

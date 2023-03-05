@@ -2,6 +2,7 @@ import { Response } from "express";
 import Task from "../../database/model/final/Task";
 import ToDoGroup from "../../database/model/final/ToDoGroup";
 import MMToDoToDoGroup from "../../database/model/relations/MMToDoToDoGroup";
+import MMUserFavouriteToDoGroup from "../../database/model/relations/MMUserFavouriteToDoGroup";
 import MMUserToDoGroup from "../../database/model/relations/MMUserToDoGroup";
 import { ErrorResponse } from "../../middleware/custom-error";
 import { ErrorReasons, OkMessage, StatusCode } from "../../utils/constants";
@@ -114,4 +115,55 @@ export const deleteGroup = async (req: ToDoGroupRequest, res: Response) => {
     })
 
     res.json(OkMessage);
+}
+
+export const addToFavouriteList = async (req: ToDoGroupRequest, res: Response) => {
+    if (!req.params.id) {
+        throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
+    }
+
+    const isUserOwner = await MMUserToDoGroup.findOne({
+        where: {
+            userId: req.user.id,
+            groupId: req.params.id
+        }
+    })
+
+    if (!isUserOwner) {
+        throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
+    }
+
+    await MMUserFavouriteToDoGroup.create({
+        userId: req.user.id,
+        groupId: req.params.id
+    })
+
+    res.json(OkMessage);
+}
+
+export const getGroupUserList = async (req: ToDoGroupRequest, res: Response) => {
+    if (!req.params.id) {
+        throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
+    }
+
+    const isUserOwner = await MMUserToDoGroup.findOne({
+        where: {
+            userId: req.user.id,
+            groupId: req.params.id
+        }
+    })
+
+    if (!isUserOwner) {
+        throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
+    }
+
+    const userList = await MMUserToDoGroup.findAll({
+        where: {
+            groupId: req.params.id
+        }
+    })
+
+    // конвертировать в юзеров
+
+    res.json({ userList });
 }

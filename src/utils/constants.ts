@@ -54,6 +54,7 @@ export class DatabaseInfo {
     static USER_GROUP_TABLE_NAME = 'user_group'
     static USER_TASK_TABLE_NAME = "user_task"
     static USER_FAVOURITE_TASK_TABLE_NAME = "user__favourite_task"
+    static USER_FAVOURITE_GROUP_TABLE_NAME = "user__favourite_group"
     static TASK_GROUP_TABLE_NAME = 'user_group'
 }
 

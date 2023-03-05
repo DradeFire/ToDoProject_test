@@ -16,9 +16,6 @@ export const create = async (req: TaskRequest, res: Response) => {
   if (!req.body.isCompleted) {
     throw new ErrorResponse(ErrorReasons.ISCOMPLITED_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
-  if (!req.body.favourite) {
-    throw new ErrorResponse(ErrorReasons.FAVOURITE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
 
   const task = await Task.create({
     title: req.body.title,
@@ -26,26 +23,12 @@ export const create = async (req: TaskRequest, res: Response) => {
     isCompleted: req.body.isCompleted,
   });
 
-  if (req.body.favourite) {
-    await MMUserFavouriteToDo.create({
-      userId: req.user.id,
-      taskId: task.id
-    });
-  } else {
-    await MMUserFavouriteToDo.destroy({
-      where: {
-        userId: req.user.id,
-        taskId: task.id
-      }
-    })
-  }
-
   await MMUserToDo.create({
     userId: req.user.id,
     taskId: task.id
   });
 
-  res.json(task);
+  res.json(task.toJSON());
 };
 
 export const update = async (req: TaskRequest, res: Response) => {
@@ -57,9 +40,6 @@ export const update = async (req: TaskRequest, res: Response) => {
   }
   if (!req.body.isCompleted) {
     throw new ErrorResponse(ErrorReasons.ISCOMPLITED_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
-  if (!req.body.favourite) {
-    throw new ErrorResponse(ErrorReasons.FAVOURITE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
 
   const task = await Task.findOne({
@@ -88,20 +68,6 @@ export const update = async (req: TaskRequest, res: Response) => {
     description: req.body.description,
     isCompleted: req.body.isCompleted,
   });
-
-  if (req.body.favourite) {
-    await MMUserFavouriteToDo.create({
-      userId: req.user.id,
-      taskId: task.id
-    });
-  } else {
-    await MMUserFavouriteToDo.destroy({
-      where: {
-        userId: req.user.id,
-        taskId: task.id
-      }
-    })
-  }
 
   res.json(OkMessage);
 };
@@ -189,4 +155,56 @@ export const deleteAll = async (req: TaskRequest, res: Response) => {
 
   res.json(OkMessage);
 };
+
+export const addToFavouriteList = async (req: TaskRequest, res: Response) => {
+  if (!req.params.id) {
+    throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
+  }
+
+  const isUserOwner = await MMUserToDo.findOne({
+    where: {
+      userId: req.user.id,
+      taskId: req.params.id
+    }
+  })
+
+  if (!isUserOwner) {
+    throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
+  }
+
+  await MMUserFavouriteToDo.create({
+    userId: req.user.id,
+    taskId: req.params.id
+  })
+
+
+  res.json(OkMessage);
+}
+
+export const getTaskUserList = async (req: TaskRequest, res: Response) => {
+  if (!req.params.id) {
+    throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
+  }
+
+  const isUserOwner = await MMUserToDo.findOne({
+    where: {
+      userId: req.user.id,
+      taskId: req.params.id
+    }
+  })
+
+  if (!isUserOwner) {
+    throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
+  }
+
+  const userList = await MMUserToDo.findAll({
+    where: {
+      taskId: req.params.id
+    }
+  })
+
+  // конвертировать в юзеров
+
+  res.json({ userList });
+}
 
