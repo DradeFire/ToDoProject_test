@@ -12,7 +12,7 @@ export class ErrorReasons {
     static EMAIL_NOT_SEND_400 = "Email not send"
     static PASSWORD_NOT_SEND_400 = "Password not send"
     static FIRSTNAME_NOT_SEND_400 = "Firstname not send"
-    static BIRTHDATE_NOT_SEND_400 = "Firstname not send"
+    static BIRTHDATE_NOT_SEND_400 = "birthDate not send"
     static TITLE_NOT_SEND_400 = "TItle not send"
     static DESCRIPTION_NOT_SEND_400 = "Description not send"
     static ISCOMPLITED_NOT_SEND_400 = "IsComplited not send"
@@ -26,6 +26,7 @@ export class ErrorReasons {
     static USER_NOT_IN_GROUP_400 = "User not in group"
     static NOT_OWNER_GROUP_403 = "You aren`t owner this group"
     static USER_NOT_FOUND_404 = "User not found"
+    static LINK_DATA_NOT_VALID_400 = "Link data not valid"
 }
 
 export class StatusCode {
@@ -56,6 +57,8 @@ export class DatabaseInfo {
     static USER_FAVOURITE_TASK_TABLE_NAME = "user__favourite_task"
     static USER_FAVOURITE_GROUP_TABLE_NAME = "user__favourite_group"
     static TASK_GROUP_TABLE_NAME = 'user_group'
+    static INVITE_LINK_GROUP_TABLE_NAME = 'invite_link_group'
+    static INVITE_LINK_TASK_TABLE_NAME = 'invite_link_task'
 }
 
 export const JWT_SECRET = "1029384756qpwoeirutyalskdjfhgQWEASDZXC"

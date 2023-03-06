@@ -4,7 +4,7 @@ import { taskRoutes } from "./routers/tasks";
 import { initDB } from "./database/db/db";
 import { Env } from "./utils/env_config";
 import { UrlConst } from "./utils/constants";
-import { groupRoutes } from "./routers/group";
+import groupRoutes from "./routers/group";
 import cors from "cors";
 import { profileRoutes } from "./routers/profile";
 import { notFound } from "./middleware/notFoundHandler";
@@ -12,7 +12,7 @@ import { errorHandler } from "./middleware/errorHandler";
 import { requireToken } from "./middleware/requireToken";
 import { asyncHandler } from "./middleware/asyncHandler";
 
-export class App {
+export default class App {
   private app: Application;
   private port: number
 
@@ -60,7 +60,7 @@ export class App {
 
   private initControllers() {
     this.app.use("/api/auth", authRoutes);
-    this.app.use("/api/tasks", asyncHandler(requireToken), taskRoutes);
+    this.app.use("/api/task", asyncHandler(requireToken), taskRoutes);
     this.app.use("/api/group", asyncHandler(requireToken), groupRoutes);
     this.app.use("/api/profile", asyncHandler(requireToken), profileRoutes);
   }

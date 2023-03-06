@@ -4,8 +4,9 @@ import { Response } from 'express';
 import { UserRequest } from '../models/models';
 import { ErrorReasons, OkMessage, StatusCode } from "../../utils/constants";
 import { ErrorResponse } from "../../middleware/custom-error";
-import User from "../../database/model/final/User";
-import Token from "../../database/model/final/Token";
+import User from "../../database/model/final/User.model";
+import Token from "../../database/model/final/Token.model";
+import { checkExistCandidate, getAndCheckAuthCandidate } from "../base/controllers/BaseAuth";
 
 export const login = async (req: UserRequest, res: Response) => {
   if (!req.body.email) {
@@ -15,14 +16,7 @@ export const login = async (req: UserRequest, res: Response) => {
     throw new ErrorResponse(ErrorReasons.PASSWORD_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
 
-  const candidate = await User.findOne({
-    where: {
-      email: req.body.email
-    }
-  });
-  if (!candidate) {
-    throw new ErrorResponse(ErrorReasons.INCORRECT_LOGIN_400, StatusCode.BAD_REQUEST_400);
-  }
+  const candidate = await getAndCheckAuthCandidate(req.body.email)
 
   const passwordResult = bcrypt.compareSync(
     req.body.pass,
@@ -55,18 +49,9 @@ export const registration = async (req: UserRequest, res: Response) => {
     throw new ErrorResponse(ErrorReasons.BIRTHDATE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
 
-  const candidate = await User.findOne({
-    where: {
-      email: req.body.email
-    }
-  });
-  if (candidate) {
-    throw new ErrorResponse(ErrorReasons.USER_EMAIL_EXIST_400, StatusCode.BAD_REQUEST_400);
-  }
+  await checkExistCandidate(req.body.email)
 
-  const salt = bcrypt.genSaltSync(10);
-  const password = req.body.pass;
-  const hashPassword = bcrypt.hashSync(password, salt);
+  const hashPassword = bcrypt.hashSync(req.body.pass, bcrypt.genSaltSync(10));
   const user = await User.create({
     email: req.body.email,
     pass: hashPassword,

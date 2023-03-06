@@ -1,4 +1,4 @@
-import { App } from "./app";
+import App from "./app";
 import CurrentEnv, { Env } from "./utils/env_config";
 
 async function startApp(env: Env) {

@@ -1,7 +1,7 @@
 import { NextFunction } from "express";
-import Token from "../database/model/final/Token";
-import User from "../database/model/final/User";
-import { RequestWithToken } from "../modules/models/models";
+import Token from "../database/model/final/Token.model";
+import User from "../database/model/final/User.model";
+import { RequestWithToken } from "../modules/base/models/BaseModels";
 import { ErrorReasons, StatusCode, UrlConst } from "../utils/constants";
 import { ErrorResponse } from "./custom-error";
 

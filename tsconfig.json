@@ -3,7 +3,7 @@
     "sourceMap": true,
     "target": "ES6",
     "allowSyntheticDefaultImports": true,
-    "module": "es6",
+    "module": "commonjs",
     "outDir": "./dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

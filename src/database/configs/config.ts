@@ -2,10 +2,10 @@ import { Dialect } from "sequelize";
 
 class Config {
   static dialect: Dialect = 'postgres'
-  static host = "db_auth"
+  static host = "localhost" //"db_auth"
   static username = "postgres"
   static password = "1358"
-  static models = [__dirname + '../model/final/*.ts'/*, __dirname + '/models/relations/*.ts'*/]
+  static models = [__dirname + '../model/final/*.model.*', __dirname + '../models/relations/*.model.*']
   static port = 5432
 }
 

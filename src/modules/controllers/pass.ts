@@ -1,28 +1,13 @@
 import bcrypt from "bcryptjs";
 import { Response } from 'express';
 import { UserRequest, ChangePassRequest, RecoverPassRequest } from '../models/models';
-import { ErrorReasons, JWT_SECRET, OkMessage, StatusCode, Transporter, UrlConst } from "../../utils/constants";
+import { ErrorReasons, JWT_SECRET, OkMessage, StatusCode, Transporter } from "../../utils/constants";
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
-import CurrentEnv, { Env } from "../../utils/env_config";
 import { ErrorResponse } from "../../middleware/custom-error";
-import User from "../../database/model/final/User";
-
-
-function getCurrentPort(): number {
-    switch (CurrentEnv.env) {
-        case Env.DEV: {
-            return UrlConst.DEV_PORT;
-        }
-        case Env.TEST: {
-            return UrlConst.DEV_PORT;
-        }
-        case Env.PROD: {
-            return UrlConst.PROD_PORT;
-        }
-    }
-}
-
+import User from "../../database/model/final/User.model";
+import { getCurrentPort } from "../../utils/env_config";
+import { PayloadResetPass } from "../dto/models";
 
 export const resetPassword = async (req: UserRequest, res: Response) => {
     const { email, token } = req.params;
@@ -30,9 +15,9 @@ export const resetPassword = async (req: UserRequest, res: Response) => {
     const secret = JWT_SECRET + req.body.email
     const payload = jwt.verify(token, secret)
 
-    // if (payload.email as string !== email) {
-    //     throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
-    // }
+    if ((payload as PayloadResetPass).email as string !== email) {
+        throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
+    }
 
     const candidate = await User.findOne({
         where: {
@@ -136,7 +121,7 @@ export const changePassword = async (req: ChangePassRequest, res: Response) => {
     const lastPassword = req.body.lastPassword;
     const newPassword = req.body.newPassword;
 
-    const passwordResult = bcrypt.compareSync(lastPassword, req.user.pass as string);
+    const passwordResult = bcrypt.compareSync(lastPassword, req.user.pass);
     if (!passwordResult) {
         throw new ErrorResponse(ErrorReasons.INCORRECT_LAST_PASSWORD_400, StatusCode.BAD_REQUEST_400);
     }

@@ -34,7 +34,7 @@ export class IdParamModel {
 }
 
 export class RoleGroupModel {
-    id: string | undefined
+    id: number | undefined
     userEmail: string | undefined
     groupTitle: string | undefined
     role: string | undefined
@@ -45,4 +45,24 @@ export class ToDoGroupModel {
     title: string | undefined
     description: string | undefined
     ownerEmail: string | undefined
+}
+
+export class ChangeLinkModel {
+    role: string | undefined
+    isEnabled: boolean | undefined
+}
+
+export class PayloadTaskLink {
+    taskId!: string
+    role!: string
+}
+
+export class PayloadGroupLink {
+    groupId!: string
+    role!: string
+}
+
+export class PayloadResetPass {
+    email!: string
+    firstName!: string
 }

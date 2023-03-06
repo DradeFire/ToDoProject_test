@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize";
+import { Sequelize } from "sequelize-typescript";
 import { createNamespace } from "cls-hooked";
 import { Dev_Config, PROD_Config, TEST_Config } from "../configs/config";
 import CurrentEnv, { Env } from "../../utils/env_config";
@@ -17,6 +17,10 @@ function getSequelize(): Sequelize {
           dialect: Dev_Config.dialect,
           host: Dev_Config.host,
           port: Dev_Config.port,
+          models: [__dirname + '/../model/final/*.model.ts', __dirname + '/../models/relations/*.model.ts'],
+          modelMatch: (filename, member) => {
+            return filename.substring(0, filename.indexOf('.model')) === member.toLowerCase();
+          },
         },
       );
     }
@@ -29,6 +33,7 @@ function getSequelize(): Sequelize {
           dialect: PROD_Config.dialect,
           host: PROD_Config.host,
           port: PROD_Config.port,
+          models: [__dirname + '../model/final/*.model.*', __dirname + '../models/relations/*.model.*']
         },
       );
     }
@@ -41,6 +46,7 @@ function getSequelize(): Sequelize {
           dialect: TEST_Config.dialect,
           host: TEST_Config.host,
           port: TEST_Config.port,
+          models: [__dirname + '../model/final/*.model.*', __dirname + '../models/relations/*.model.*']
         },
       );
     }

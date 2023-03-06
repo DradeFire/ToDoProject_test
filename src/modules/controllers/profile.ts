@@ -1,8 +1,8 @@
 import { Response } from "express";
-import Task from "../../database/model/final/Task";
-import MMToDoToDoGroup from "../../database/model/relations/MMToDoToDoGroup";
-import MMUserToDo from "../../database/model/relations/MMUserToDo";
-import MMUserToDoGroup from "../../database/model/relations/MMUserToDoGroup";
+import Task from "../../database/model/final/Task.model";
+import MMToDoToDoGroup from "../../database/model/relations/MMToDoToDoGroup.model";
+import MMUserToDo from "../../database/model/relations/MMUserToDo.model";
+import MMUserToDoGroup from "../../database/model/relations/MMUserToDoGroup.model";
 import { ErrorResponse } from "../../middleware/custom-error";
 import { ErrorReasons, OkMessage, StatusCode } from "../../utils/constants";
 import { UserRequest } from "../models/models";
