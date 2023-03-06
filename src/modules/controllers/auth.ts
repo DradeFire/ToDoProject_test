@@ -1,14 +1,14 @@
 import { nanoid } from "nanoid";
 import bcrypt from "bcryptjs";
-import { Response } from 'express';
 import { UserRequest } from '../models/models';
 import { ErrorReasons, OkMessage, StatusCode } from "../../utils/constants";
 import { ErrorResponse } from "../../middleware/custom-error";
 import User from "../../database/model/final/User.model";
 import Token from "../../database/model/final/Token.model";
 import { checkExistCandidate, getAndCheckAuthCandidate } from "../base/controllers/BaseAuth";
+import { FastifyReply } from "fastify";
 
-export const login = async (req: UserRequest, res: Response) => {
+export const login = async (req: UserRequest, res: FastifyReply) => {
   if (!req.body.email) {
     throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
@@ -32,10 +32,10 @@ export const login = async (req: UserRequest, res: Response) => {
     value: nanoid(128),
   });
 
-  res.json(newToken.toJSON());
+  res.status(200).send(newToken.toJSON());
 };
 
-export const registration = async (req: UserRequest, res: Response) => {
+export const registration = async (req: UserRequest, res: FastifyReply) => {
   if (!req.body.email) {
     throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
@@ -59,14 +59,14 @@ export const registration = async (req: UserRequest, res: Response) => {
     birthDate: req.body.birthDate
   });
 
-  res.json(user.toJSON());
+  res.status(200).send(user.toJSON());
 };
 
-export const logout = async (req: UserRequest, res: Response) => {
+export const logout = async (req: UserRequest, res: FastifyReply) => {
   await req.token.destroy();
-  res.json(OkMessage);
+  res.status(200).send(OkMessage);
 };
 
-export const me = async (req: UserRequest, res: Response) => {
-  res.json(req.user.toJSON());
+export const me = async (req: UserRequest, res: FastifyReply) => {
+  res.status(200).send(req.user.toJSON());
 };

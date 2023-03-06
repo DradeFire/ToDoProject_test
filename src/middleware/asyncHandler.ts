@@ -1,5 +1,7 @@
-import { Request, Response, NextFunction } from "express";
+import { HookHandlerDoneFunction } from "fastify";
+import { FastifyReply } from "fastify/types/reply";
+import { FastifyRequest } from "fastify/types/request";
 
-export const asyncHandler = (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
+export const asyncHandler = (fn: Function) => (req: FastifyRequest, res: FastifyReply, /*next: HookHandlerDoneFunction*/) => {
+  Promise.resolve(fn(req, res))//.catch(next());
 };

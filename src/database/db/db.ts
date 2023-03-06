@@ -1,10 +1,6 @@
 import { Sequelize } from "sequelize-typescript";
-import { createNamespace } from "cls-hooked";
 import { Dev_Config, PROD_Config, TEST_Config } from "../configs/config";
 import CurrentEnv, { Env } from "../../utils/env_config";
-
-const namespace = createNamespace("ns");
-Sequelize.useCLS(namespace);
 
 function getSequelize(): Sequelize {
   switch (CurrentEnv.env) {

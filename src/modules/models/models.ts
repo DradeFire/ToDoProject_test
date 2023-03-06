@@ -1,17 +1,17 @@
-import { RequestWithToken } from "../base/models/BaseModels";
+import { SchemeWithToken } from "../base/models/BaseModels";
 import { UserModel, ToDoModel, ChangePassModel, RecoverPassModel, ToDoGroupModel, RoleGroupModel, ChangeLinkModel } from "../dto/models"
 
 
-export interface UserRequest extends RequestWithToken<UserModel> { }
+export interface UserRequest extends SchemeWithToken<UserModel> {}
 
-export interface TaskRequest extends RequestWithToken<ToDoModel> { }
+export interface TaskRequest extends SchemeWithToken<ToDoModel> {}
 
-export interface ChangePassRequest extends RequestWithToken<ChangePassModel> { }
+export interface ChangePassRequest extends SchemeWithToken<ChangePassModel> {}
 
-export interface RecoverPassRequest extends RequestWithToken<RecoverPassModel> { }
+export interface RecoverPassRequest extends SchemeWithToken<RecoverPassModel> {}
 
-export interface ToDoGroupRequest extends RequestWithToken<ToDoGroupModel> {}
+export interface ToDoGroupRequest extends SchemeWithToken<ToDoGroupModel> {}
 
-export interface RoleGroupRequest extends RequestWithToken<RoleGroupModel> {}
+export interface RoleGroupRequest extends SchemeWithToken<RoleGroupModel> {}
 
-export interface ChangeLinkRequest extends RequestWithToken<ChangeLinkModel> {}
+export interface ChangeLinkRequest extends SchemeWithToken<ChangeLinkModel> {}

@@ -1,4 +1,3 @@
-import { Response } from "express";
 import Task from "../../database/model/final/Task.model";
 import MMToDoToDoGroup from "../../database/model/relations/MMToDoToDoGroup.model";
 import MMUserToDo from "../../database/model/relations/MMUserToDo.model";
@@ -6,8 +5,9 @@ import MMUserToDoGroup from "../../database/model/relations/MMUserToDoGroup.mode
 import { ErrorResponse } from "../../middleware/custom-error";
 import { ErrorReasons, OkMessage, StatusCode } from "../../utils/constants";
 import { UserRequest } from "../models/models";
+import { FastifyReply } from "fastify";
 
-export const updateProfile = async (req: UserRequest, res: Response) => {
+export const updateProfile = async (req: UserRequest, res: FastifyReply) => {
     if (!req.body.firstName) {
         throw new ErrorResponse(ErrorReasons.FIRSTNAME_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
     }
@@ -20,10 +20,10 @@ export const updateProfile = async (req: UserRequest, res: Response) => {
         firstName: req.body.firstName
     });
 
-    res.json(OkMessage);
+    res.status(200).send(OkMessage);
 }
 
-export const deleteProfile = async (req: UserRequest, res: Response) => {
+export const deleteProfile = async (req: UserRequest, res: FastifyReply) => {
     const groupIdList = await MMUserToDoGroup.findAll({
         where: {
             userId: req.user.id,
@@ -84,5 +84,5 @@ export const deleteProfile = async (req: UserRequest, res: Response) => {
         }
     });
 
-    res.json(OkMessage);
+    res.status(200).send(OkMessage);
 }

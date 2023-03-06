@@ -1,23 +1,25 @@
-import express, { Application } from "express";
 import { authRoutes } from "./routers/auth";
 import { taskRoutes } from "./routers/tasks";
 import { initDB } from "./database/db/db";
 import { Env } from "./utils/env_config";
 import { UrlConst } from "./utils/constants";
 import groupRoutes from "./routers/group";
-import cors from "cors";
 import { profileRoutes } from "./routers/profile";
 import { notFound } from "./middleware/notFoundHandler";
 import { errorHandler } from "./middleware/errorHandler";
 import { requireToken } from "./middleware/requireToken";
 import { asyncHandler } from "./middleware/asyncHandler";
+import Fastify, { FastifyInstance } from "fastify";
+import cors from '@fastify/cors'
+import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
+import ejs from "@fastify/view";
 
 export default class App {
-  private app: Application;
+  readonly app: FastifyInstance;
   private port: number
 
   constructor(env: Env) {
-    this.app = express();
+    this.app = Fastify({ logger: true }).withTypeProvider<TypeBoxTypeProvider>();
 
     switch (env) {
       case Env.DEV: {
@@ -45,28 +47,30 @@ export default class App {
 
     return app;
   }
-  
+
   private initUtils() {
-    this.app.use(cors());
-    this.app.use(express.urlencoded({ extended: true }));
-    this.app.use(express.json());
-    this.app.set('view engine', 'ejs')
+    this.app.register(cors);
+    this.app.register(ejs, {
+      engine: {
+        ejs: require("ejs"),
+      },
+    });
   }
 
   private initErrorHandling() {
-    this.app.use(notFound);
-    this.app.use(errorHandler);
+    this.app.setNotFoundHandler(notFound);
+    this.app.setErrorHandler(errorHandler);
   }
 
   private initControllers() {
-    this.app.use("/api/auth", authRoutes);
-    this.app.use("/api/task", asyncHandler(requireToken), taskRoutes);
-    this.app.use("/api/group", asyncHandler(requireToken), groupRoutes);
-    this.app.use("/api/profile", asyncHandler(requireToken), profileRoutes);
+    authRoutes(this.app);
+    this.app.route({ url: "/api/task", preHandler: asyncHandler(requireToken), handler: taskRoutes, schema: {}, method: ['DELETE', 'GET', 'PATCH', 'POST'] });
+    this.app.route({ url: "/api/group", preHandler: asyncHandler(requireToken), handler: groupRoutes, schema: {}, method: ['DELETE', 'GET', 'PATCH', 'POST'] });
+    this.app.route({ url: "/api/profile", preHandler: asyncHandler(requireToken), handler: profileRoutes, schema: {}, method: ['DELETE', 'GET', 'PATCH', 'POST'] });
   }
 
   async listen() {
-    this.app.listen(this.port, () => console.log(`Server has been started ${this.port}`));
+    this.app.listen({ port: this.port }, () => console.log(`Server has been started ${this.port}`));
   }
 
 }

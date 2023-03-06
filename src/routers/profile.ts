@@ -1,4 +1,3 @@
-import { Router } from "express";
 import { asyncHandler } from "../middleware/asyncHandler";
 import { deleteProfile, updateProfile } from "../modules/controllers/profile";
 

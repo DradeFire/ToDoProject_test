@@ -1,5 +1,4 @@
 import bcrypt from "bcryptjs";
-import { Response } from 'express';
 import { UserRequest, ChangePassRequest, RecoverPassRequest } from '../models/models';
 import { ErrorReasons, JWT_SECRET, OkMessage, StatusCode, Transporter } from "../../utils/constants";
 import nodemailer from 'nodemailer';
@@ -8,8 +7,9 @@ import { ErrorResponse } from "../../middleware/custom-error";
 import User from "../../database/model/final/User.model";
 import { getCurrentPort } from "../../utils/env_config";
 import { PayloadResetPass } from "../dto/models";
+import { FastifyReply } from "fastify";
 
-export const resetPassword = async (req: UserRequest, res: Response) => {
+export const resetPassword = async (req: UserRequest, res: FastifyReply) => {
     const { email, token } = req.params;
 
     const secret = JWT_SECRET + req.body.email
@@ -28,12 +28,12 @@ export const resetPassword = async (req: UserRequest, res: Response) => {
         throw new ErrorResponse(ErrorReasons.INCORRECT_LOGIN_400, StatusCode.BAD_REQUEST_400);
     }
 
-    res.render('reset-password', {
+    res.view('reset-password', {
         email: email
     })
 };
 
-export const resetPassSendMail = async (req: UserRequest, res: Response) => {
+export const resetPassSendMail = async (req: UserRequest, res: FastifyReply) => {
     if (!req.body.email) {
         throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
     }
@@ -70,11 +70,11 @@ export const resetPassSendMail = async (req: UserRequest, res: Response) => {
     }, (err, info) => {
         console.log(err)
         console.log(info)
-        res.json(OkMessage);
+        res.status(200).send(OkMessage);
     });
 };
 
-export const recoverPass = async (req: RecoverPassRequest, res: Response) => {
+export const recoverPass = async (req: RecoverPassRequest, res: FastifyReply) => {
     if (!req.body.email) {
         throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
     }
@@ -107,10 +107,10 @@ export const recoverPass = async (req: RecoverPassRequest, res: Response) => {
         }
     );
 
-    res.json(OkMessage);
+    res.status(200).send(OkMessage);
 };
 
-export const changePassword = async (req: ChangePassRequest, res: Response) => {
+export const changePassword = async (req: ChangePassRequest, res: FastifyReply) => {
     if (!req.body.lastPassword) {
         throw new ErrorResponse(ErrorReasons.PASSWORD_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
     }
@@ -138,5 +138,5 @@ export const changePassword = async (req: ChangePassRequest, res: Response) => {
         }
     );
 
-    res.json(OkMessage);
+    res.status(200).send(OkMessage);
 };

@@ -1,4 +1,3 @@
-import { Response } from "express";
 import InviteLink_Group from "../../database/model/final/InviteLink_Group.model";
 import Task from "../../database/model/final/Task.model";
 import ToDoGroup from "../../database/model/final/ToDoGroup.model";
@@ -11,8 +10,9 @@ import { ChangeLinkRequest, ToDoGroupRequest } from "../models/models";
 import { checkGroupRole, checkOwner, checkRoleIsValid, getAndCreateGroupInviteLink, getGroupById } from "../base/controllers/BaseGroup";
 import jwt from 'jsonwebtoken';
 import { PayloadGroupLink } from "../dto/models";
+import { FastifyReply } from "fastify";
 
-export const createGroup = async (req: ToDoGroupRequest, res: Response) => {
+export const createGroup = async (req: ToDoGroupRequest, res: FastifyReply) => {
     if (!req.body.title) {
         throw new ErrorResponse(ErrorReasons.TITLE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
     }
@@ -48,10 +48,10 @@ export const createGroup = async (req: ToDoGroupRequest, res: Response) => {
         isEnabled: true
     });
 
-    res.json(group.toJSON());
+    res.status(200).send(group.toJSON());
 }
 
-export const updateGroup = async (req: ToDoGroupRequest, res: Response) => {
+export const updateGroup = async (req: ToDoGroupRequest, res: FastifyReply) => {
     if (!req.body.groupId) {
         throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
     }
@@ -72,10 +72,10 @@ export const updateGroup = async (req: ToDoGroupRequest, res: Response) => {
             })
         })
 
-    res.json(OkMessage);
+    res.status(200).send(OkMessage);
 }
 
-export const deleteGroup = async (req: ToDoGroupRequest, res: Response) => {
+export const deleteGroup = async (req: ToDoGroupRequest, res: FastifyReply) => {
     if (!req.body.groupId) {
         throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
     }
@@ -106,10 +106,10 @@ export const deleteGroup = async (req: ToDoGroupRequest, res: Response) => {
         })
     })
 
-    res.json(OkMessage);
+    res.status(200).send(OkMessage);
 }
 
-export const addToFavouriteList = async (req: ToDoGroupRequest, res: Response) => {
+export const addToFavouriteList = async (req: ToDoGroupRequest, res: FastifyReply) => {
     if (!req.params.id) {
         throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
     }
@@ -121,10 +121,10 @@ export const addToFavouriteList = async (req: ToDoGroupRequest, res: Response) =
         groupId: req.params.id
     })
 
-    res.json(OkMessage);
+    res.status(200).send(OkMessage);
 }
 
-export const getGroupUserList = async (req: ToDoGroupRequest, res: Response) => {
+export const getGroupUserList = async (req: ToDoGroupRequest, res: FastifyReply) => {
     if (!req.params.id) {
         throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
     }
@@ -139,11 +139,11 @@ export const getGroupUserList = async (req: ToDoGroupRequest, res: Response) => 
 
     // конвертировать в юзеров
 
-    res.json({ userList });
+    res.status(200).send({ userList });
 }
 
 
-export const getGroupInviteLink = async (req: ToDoGroupRequest, res: Response) => {
+export const getGroupInviteLink = async (req: ToDoGroupRequest, res: FastifyReply) => {
     if (!req.params.id) {
         throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
     }
@@ -157,10 +157,10 @@ export const getGroupInviteLink = async (req: ToDoGroupRequest, res: Response) =
 
     const link = linkModel.link;
 
-    res.json({ link: link });
+    res.status(200).send({ link: link });
 }
 
-export const updateGroupInviteLink = async (req: ChangeLinkRequest, res: Response) => {
+export const updateGroupInviteLink = async (req: ChangeLinkRequest, res: FastifyReply) => {
     if (!req.params.id) {
         throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
     }
@@ -182,10 +182,10 @@ export const updateGroupInviteLink = async (req: ChangeLinkRequest, res: Respons
             })
         });
 
-    res.json(OkMessage);
+    res.status(200).send(OkMessage);
 }
 
-export const inviteHandler = async (req: ToDoGroupRequest, res: Response) => {
+export const inviteHandler = async (req: ToDoGroupRequest, res: FastifyReply) => {
     const secret = JWT_SECRET
     const payload = jwt.verify(req.params.token, secret)
 
@@ -195,5 +195,5 @@ export const inviteHandler = async (req: ToDoGroupRequest, res: Response) => {
         role: (payload as PayloadGroupLink).role
     });
 
-    res.json(OkMessage);
+    res.status(200).send(OkMessage);
 }

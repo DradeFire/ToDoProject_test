@@ -1,13 +1,13 @@
-import { Response } from "express";
 import MMUserToDo from "../../database/model/relations/MMUserToDo.model";
 import MMUserToDoGroup from "../../database/model/relations/MMUserToDoGroup.model";
 import { ErrorResponse } from "../../middleware/custom-error";
 import { ErrorReasons, OkMessage, StatusCode } from "../../utils/constants";
 import { checkOwnerWithRole, checkRoleIsValid } from "../base/controllers/BaseGroup";
 import { RoleGroupRequest } from "../models/models";
+import { FastifyReply } from "fastify";
 
 
-export const addUser = async (req: RoleGroupRequest, res: Response) => {
+export const addUser = async (req: RoleGroupRequest, res: FastifyReply) => {
     if (!req.body.id) {
         throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
     }
@@ -37,10 +37,10 @@ export const addUser = async (req: RoleGroupRequest, res: Response) => {
         role: req.body.role
     });
 
-    res.json(OkMessage);
+    res.status(200).send(OkMessage);
 }
 
-export const updateRole = async (req: RoleGroupRequest, res: Response) => {
+export const updateRole = async (req: RoleGroupRequest, res: FastifyReply) => {
     if (!req.body.id) {
         throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
     }
@@ -66,10 +66,10 @@ export const updateRole = async (req: RoleGroupRequest, res: Response) => {
         });
     })
 
-    res.json(OkMessage);
+    res.status(200).send(OkMessage);
 }
 
-export const deleteUser = async (req: RoleGroupRequest, res: Response) => {
+export const deleteUser = async (req: RoleGroupRequest, res: FastifyReply) => {
     if (!req.body.userEmail) {
         throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
     }
@@ -86,10 +86,10 @@ export const deleteUser = async (req: RoleGroupRequest, res: Response) => {
         }
     });
 
-    res.json(OkMessage);
+    res.status(200).send(OkMessage);
 }
 
-export const leaveGroup = async (req: RoleGroupRequest, res: Response) => {
+export const leaveGroup = async (req: RoleGroupRequest, res: FastifyReply) => {
     if (!req.body.id) {
         throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
     }
@@ -101,5 +101,5 @@ export const leaveGroup = async (req: RoleGroupRequest, res: Response) => {
         }
     });
 
-    res.json(OkMessage);
+    res.status(200).send(OkMessage);
 }

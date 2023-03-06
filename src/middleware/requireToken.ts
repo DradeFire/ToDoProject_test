@@ -1,12 +1,13 @@
-import { NextFunction } from "express";
+import { HookHandlerDoneFunction } from "fastify/types/hooks";
+import { FastifyReply } from "fastify/types/reply";
 import Token from "../database/model/final/Token.model";
 import User from "../database/model/final/User.model";
-import { RequestWithToken } from "../modules/base/models/BaseModels";
+import { SchemeWithToken } from "../modules/base/models/BaseModels";
 import { ErrorReasons, StatusCode, UrlConst } from "../utils/constants";
 import { ErrorResponse } from "./custom-error";
 
-export const requireToken = async <K, T extends RequestWithToken<K>>(req: T, _res: Response, next: NextFunction) => {
-    const token = req.header(UrlConst.HEADER_ACCESS_TOKEN);
+export const requireToken = async <K, T extends SchemeWithToken<K>>(req: T, _res: FastifyReply, next: HookHandlerDoneFunction) => {
+    const token = req.headers.Authorization;
     if (!token) {
         throw new ErrorResponse(ErrorReasons.NO_TOKEN_SEND_403, StatusCode.UNAUTHORIZED_403);
     }

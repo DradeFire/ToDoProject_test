@@ -1,4 +1,3 @@
-import { Response } from 'express';
 import { ChangeLinkRequest, TaskRequest } from '../models/models';
 import { ErrorReasons, JWT_SECRET, OkMessage, StatusCode } from '../../utils/constants'
 import { ErrorResponse } from "../../middleware/custom-error";
@@ -9,8 +8,9 @@ import InviteLink_Task from '../../database/model/final/InviteLink_Task.model';
 import { checkGroupRole, checkOwner, checkOwnerWithRole, checkRole, getAndCreateTaskInviteLink, getTaskById } from '../base/controllers/BaseTasks';
 import jwt from 'jsonwebtoken';
 import { PayloadTaskLink } from '../dto/models';
+import { FastifyReply } from "fastify";
 
-export const create = async (req: TaskRequest, res: Response) => {
+export const create = async (req: TaskRequest, res: FastifyReply) => {
   if (!req.body.title) {
     throw new ErrorResponse(ErrorReasons.TITLE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
@@ -41,10 +41,10 @@ export const create = async (req: TaskRequest, res: Response) => {
     isEnabled: true
   });
 
-  res.json(task.toJSON());
+  res.status(200).send(task.toJSON());
 };
 
-export const update = async (req: TaskRequest, res: Response) => {
+export const update = async (req: TaskRequest, res: FastifyReply) => {
   if (!req.body.title) {
     throw new ErrorResponse(ErrorReasons.TITLE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
   }
@@ -65,10 +65,10 @@ export const update = async (req: TaskRequest, res: Response) => {
     isCompleted: req.body.isCompleted,
   });
 
-  res.json(OkMessage);
+  res.status(200).send(OkMessage);
 };
 
-export const getAll = async (req: TaskRequest, res: Response) => {
+export const getAll = async (req: TaskRequest, res: FastifyReply) => {
   const idList = await MMUserToDo.findAll({
     where: {
       userId: req.user.id
@@ -82,25 +82,25 @@ export const getAll = async (req: TaskRequest, res: Response) => {
     taskList[index] = tmp!;
   });
 
-  res.json({ taskList });
+  res.status(200).send({ taskList });
 };
 
-export const getById = async (req: TaskRequest, res: Response) => {
+export const getById = async (req: TaskRequest, res: FastifyReply) => {
   const task = await getTaskById(req.params.id)
-  res.json(task);
+  res.status(200).send(task);
 };
 
-export const deleteById = async (req: TaskRequest, res: Response) => {
+export const deleteById = async (req: TaskRequest, res: FastifyReply) => {
   const task = await getTaskById(req.params.id)
 
   await checkOwnerWithRole(req.user.id, req.params.id, "read-write")
 
   await task.destroy();
 
-  res.json(OkMessage);
+  res.status(200).send(OkMessage);
 };
 
-export const deleteAll = async (req: TaskRequest, res: Response) => {
+export const deleteAll = async (req: TaskRequest, res: FastifyReply) => {
   const idList = await MMUserToDo.findAll({
     where: {
       userId: req.user.id
@@ -112,10 +112,10 @@ export const deleteAll = async (req: TaskRequest, res: Response) => {
     task?.destroy();
   });
 
-  res.json(OkMessage);
+  res.status(200).send(OkMessage);
 };
 
-export const addToFavouriteList = async (req: TaskRequest, res: Response) => {
+export const addToFavouriteList = async (req: TaskRequest, res: FastifyReply) => {
   if (!req.params.id) {
     throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
   }
@@ -127,10 +127,10 @@ export const addToFavouriteList = async (req: TaskRequest, res: Response) => {
     taskId: req.params.id
   })
 
-  res.json(OkMessage);
+  res.status(200).send(OkMessage);
 }
 
-export const getTaskUserList = async (req: TaskRequest, res: Response) => {
+export const getTaskUserList = async (req: TaskRequest, res: FastifyReply) => {
   if (!req.params.id) {
     throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
   }
@@ -145,10 +145,10 @@ export const getTaskUserList = async (req: TaskRequest, res: Response) => {
 
   // TODO: конвертировать в юзеров
 
-  res.json({ userList });
+  res.status(200).send({ userList });
 }
 
-export const getTaskInviteLink = async (req: TaskRequest, res: Response) => {
+export const getTaskInviteLink = async (req: TaskRequest, res: FastifyReply) => {
   if (!req.params.id) {
     throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
   }
@@ -162,10 +162,10 @@ export const getTaskInviteLink = async (req: TaskRequest, res: Response) => {
 
   const link = linkModel.link;
 
-  res.json({ link: link });
+  res.status(200).send({ link: link });
 }
 
-export const updateTaskInviteLink = async (req: ChangeLinkRequest, res: Response) => {
+export const updateTaskInviteLink = async (req: ChangeLinkRequest, res: FastifyReply) => {
   if (!req.params.id) {
     throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
   }
@@ -187,10 +187,10 @@ export const updateTaskInviteLink = async (req: ChangeLinkRequest, res: Response
       })
     });
 
-  res.json(OkMessage);
+  res.status(200).send(OkMessage);
 }
 
-export const inviteHandler = async (req: TaskRequest, res: Response) => {
+export const inviteHandler = async (req: TaskRequest, res: FastifyReply) => {
   const secret = JWT_SECRET
   const payload = jwt.verify(req.params.token, secret)
 
@@ -200,5 +200,5 @@ export const inviteHandler = async (req: TaskRequest, res: Response) => {
     role: (payload as PayloadTaskLink).role
   });
 
-  res.json(OkMessage);
+  res.status(200).send(OkMessage);
 }

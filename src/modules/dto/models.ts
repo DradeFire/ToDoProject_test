@@ -27,11 +27,6 @@ export class RecoverPassModel {
     againPassword: string | undefined
 }
 
-export class IdParamModel {
-    email!: string
-    id!: number
-    token!: string
-}
 
 export class RoleGroupModel {
     id: number | undefined
@@ -65,4 +60,14 @@ export class PayloadGroupLink {
 export class PayloadResetPass {
     email!: string
     firstName!: string
+}
+
+export class IdParamModel {
+    email!: string
+    id!: number
+    token!: string
+}
+
+export class HeadersModel {
+    Authorization!: string
 }
