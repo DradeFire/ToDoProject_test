@@ -4,85 +4,102 @@ import MMToDoToDoGroup from "../../database/model/relations/MMToDoToDoGroup.mode
 import MMUserToDo from "../../database/model/relations/MMUserToDo.model";
 import MMUserToDoGroup from "../../database/model/relations/MMUserToDoGroup.model";
 import { ErrorResponse } from "../../middleware/custom-error";
+import RequireTokenService from "../../middleware/requireToken";
 import { ErrorReasons, OkMessage, StatusCode } from "../../utils/constants";
 import { UserRequest } from "../models/models";
+import { Controller, Patch, Delete, Req, Res, UseFilters } from '@nestjs/common';
+import { HttpExceptionFilter } from "../../middleware/errorHandler";
 
-export const updateProfile = async (req: UserRequest, res: Response) => {
-    if (!req.body.firstName) {
-        throw new ErrorResponse(ErrorReasons.FIRSTNAME_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
+@Controller("/api/profile")
+@UseFilters(HttpExceptionFilter)
+export default class ProfileController {
+
+    constructor(private requireTokenService: RequireTokenService) {
     }
-    if (!req.body.birthDate) {
-        throw new ErrorResponse(ErrorReasons.BIRTHDATE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-    }
 
-    await req.user.update({
-        birthDate: req.body.birthDate,
-        firstName: req.body.firstName
-    });
+    @Patch()
+    async updateProfile(@Req() req: UserRequest, @Res() res: Response) {
+        await this.requireTokenService.requireToken(req, res)
 
-    res.json(OkMessage);
-}
+        if (!req.body.firstName) {
+            throw new ErrorResponse(ErrorReasons.FIRSTNAME_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
+        }
+        if (!req.body.birthDate) {
+            throw new ErrorResponse(ErrorReasons.BIRTHDATE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
+        }
 
-export const deleteProfile = async (req: UserRequest, res: Response) => {
-    const groupIdList = await MMUserToDoGroup.findAll({
-        where: {
-            userId: req.user.id,
-            role: "read-write"
-        },
-    });
-
-    groupIdList.forEach(async (val, _index, _arr) => {
-        const groupUserList = await MMUserToDoGroup.findAll({
-            where: {
-                groupId: val.groupId,
-                role: "read-write"
-            }
+        await req.user.update({
+            birthDate: req.body.birthDate,
+            firstName: req.body.firstName
         });
-        if (groupUserList.length == 1) {
-            // Чистка юзеров
-            await MMUserToDoGroup.findAll({
-                where: {
-                    groupId: val.groupId,
-                }
-            }).then((userList) => {
-                userList.forEach(async (val, _index, _arr) => {
-                    val.destroy()
-                })
-            })
 
-            // Чистка тудушек
-            await MMToDoToDoGroup.findAll({
+        res.json(OkMessage);
+    }
+
+    @Delete()
+    async deleteProfile(@Req() req: UserRequest, @Res() res: Response) {
+        await this.requireTokenService.requireToken(req, res)
+
+        const groupIdList = await MMUserToDoGroup.findAll({
+            where: {
+                userId: req.user.id,
+                role: "read-write"
+            },
+        });
+
+        groupIdList.forEach(async (val, _index, _arr) => {
+            const groupUserList = await MMUserToDoGroup.findAll({
                 where: {
                     groupId: val.groupId,
+                    role: "read-write"
                 }
-            }).then((taskList) => {
-                taskList.forEach(async (val, _index, _arr) => {
-                    await Task.findByPk(val.taskId).then((task) => {
-                        task?.destroy()
+            });
+            if (groupUserList.length == 1) {
+                // Чистка юзеров
+                await MMUserToDoGroup.findAll({
+                    where: {
+                        groupId: val.groupId,
+                    }
+                }).then((userList) => {
+                    userList.forEach(async (val, _index, _arr) => {
+                        val.destroy()
                     })
                 })
-            })
-        }
-    });
 
-    const taskIdList = await MMUserToDo.findAll({
-        where: {
-            userId: req.user.id
-        },
-    });
-
-    taskIdList.forEach(async (val, _index, _arr) => {
-        const taskIdList = await MMUserToDo.findAll({
-            where: {
-                taskId: val.taskId
+                // Чистка тудушек
+                await MMToDoToDoGroup.findAll({
+                    where: {
+                        groupId: val.groupId,
+                    }
+                }).then((taskList) => {
+                    taskList.forEach(async (val, _index, _arr) => {
+                        await Task.findByPk(val.taskId).then((task) => {
+                            task?.destroy()
+                        })
+                    })
+                })
             }
         });
-        if (taskIdList.length == 1) {
-            await Task.findByPk(val.taskId).then((task) => {
-                task?.destroy()
-            });
-        }
-    });
 
-    res.json(OkMessage);
+        const taskIdList = await MMUserToDo.findAll({
+            where: {
+                userId: req.user.id
+            },
+        });
+
+        taskIdList.forEach(async (val, _index, _arr) => {
+            const taskIdList = await MMUserToDo.findAll({
+                where: {
+                    taskId: val.taskId
+                }
+            });
+            if (taskIdList.length == 1) {
+                await Task.findByPk(val.taskId).then((task) => {
+                    task?.destroy()
+                });
+            }
+        });
+
+        res.json(OkMessage);
+    }
 }

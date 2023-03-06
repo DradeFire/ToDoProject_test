@@ -1,28 +1,12 @@
-import App from "./app";
+import { NestFactory } from "@nestjs/core";
+import { initDB } from "./database/db/db";
+import { AppModule } from "./modules/module/AppModule";
 import CurrentEnv, { Env } from "./utils/env_config";
 
 async function startApp(env: Env) {
-    let app: App
-
-    switch (env) {
-        case Env.DEV: {
-            app = await App.create(Env.DEV);
-            break;
-        }
-        case Env.TEST: {
-            app = await App.create(Env.TEST);
-            break;
-        }
-        case Env.PROD: {
-            app = await App.create(Env.PROD);
-            break;
-        }
-        default: {
-            throw Error("Unknown argument");
-        }
-    }
-
-    await app.listen()
+    const app = await NestFactory.create(AppModule);
+    await initDB();
+    await app.listen(5000);
 }
 
 startApp(CurrentEnv.env)
