@@ -1,3 +1,4 @@
 /src/modules/models/*.ts
+/src/modules/base/models/*.ts
 /src/middleware/asyncHandler.ts
 /webpack.config.js
