@@ -1,13 +1,9 @@
 import { Sequelize } from "sequelize-typescript";
-import { createNamespace } from "cls-hooked";
-import { Dev_Config, PROD_Config, TEST_Config } from "../configs/config";
+import { Dev_Config, PROD_Config } from "../configs/config";
 import CurrentEnv, { Env } from "../../utils/env_config";
 
-const namespace = createNamespace("ns");
-Sequelize.useCLS(namespace);
-
 function getSequelize(): Sequelize {
-  switch (CurrentEnv.env) {
+  switch (CurrentEnv.env()) {
     case Env.DEV: {
       return new Sequelize(
         Dev_Config.database,
@@ -17,7 +13,7 @@ function getSequelize(): Sequelize {
           dialect: Dev_Config.dialect,
           host: Dev_Config.host,
           port: Dev_Config.port,
-          models: [__dirname + '/../model/final/*.model.ts', __dirname + '/../models/relations/*.model.ts'],
+          models: Dev_Config.models,
           modelMatch: (filename, member) => {
             return filename.substring(0, filename.indexOf('.model')) === member.toLowerCase();
           },
@@ -33,20 +29,10 @@ function getSequelize(): Sequelize {
           dialect: PROD_Config.dialect,
           host: PROD_Config.host,
           port: PROD_Config.port,
-          models: [__dirname + '../model/final/*.model.*', __dirname + '../models/relations/*.model.*']
-        },
-      );
-    }
-    case Env.TEST: {
-      return new Sequelize(
-        TEST_Config.database,
-        TEST_Config.username,
-        TEST_Config.password,
-        {
-          dialect: TEST_Config.dialect,
-          host: TEST_Config.host,
-          port: TEST_Config.port,
-          models: [__dirname + '../model/final/*.model.*', __dirname + '../models/relations/*.model.*']
+          models: PROD_Config.models,
+          modelMatch: (filename, member) => {
+            return filename.substring(0, filename.indexOf('.model')) === member.toLowerCase();
+          },
         },
       );
     }

@@ -9,10 +9,6 @@ async function startApp(env: Env) {
             app = await App.create(Env.DEV);
             break;
         }
-        case Env.TEST: {
-            app = await App.create(Env.TEST);
-            break;
-        }
         case Env.PROD: {
             app = await App.create(Env.PROD);
             break;
@@ -25,4 +21,4 @@ async function startApp(env: Env) {
     await app.listen()
 }
 
-startApp(CurrentEnv.env)
+startApp(CurrentEnv.env())

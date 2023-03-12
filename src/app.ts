@@ -24,10 +24,6 @@ export default class App {
         this.port = UrlConst.DEV_PORT;
         break;
       }
-      case Env.TEST: {
-        this.port = UrlConst.DEV_PORT;
-        break;
-      }
       case Env.PROD: {
         this.port = UrlConst.PROD_PORT;
         break;
