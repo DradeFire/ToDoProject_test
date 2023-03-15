@@ -11,6 +11,8 @@ import { notFound } from "./middleware/notFoundHandler";
 import { errorHandler } from "./middleware/errorHandler";
 import { requireToken } from "./middleware/requireToken";
 import { asyncHandler } from "./middleware/asyncHandler";
+import swaggerUi from 'swagger-ui-express';
+import * as swaggerDocument from './swagger.json';
 
 export default class App {
   private app: Application;
@@ -41,9 +43,9 @@ export default class App {
 
     return app;
   }
-  
+
   private initUtils() {
-    this.app.use(cors());
+    // this.app.use(cors());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.json());
     this.app.set('view engine', 'ejs')
@@ -55,6 +57,7 @@ export default class App {
   }
 
   private initControllers() {
+    this.app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
     this.app.use("/api/auth", authRoutes);
     this.app.use("/api/task", asyncHandler(requireToken), taskRoutes);
     this.app.use("/api/group", asyncHandler(requireToken), groupRoutes);
@@ -62,7 +65,9 @@ export default class App {
   }
 
   async listen() {
-    this.app.listen(this.port, () => console.log(`Server has been started ${this.port}`));
+    this.app.listen(this.port, () => {
+      console.log(`Server has been started ${this.port}`)
+    });
   }
 
 }

@@ -20,7 +20,7 @@ export const updateProfile = async (req: UserRequest, res: Response) => {
         firstName: req.body.firstName
     });
 
-    res.json(OkMessage);
+    res.json(req.user.toJSON());
 }
 
 export const deleteProfile = async (req: UserRequest, res: Response) => {

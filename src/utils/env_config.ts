@@ -7,13 +7,13 @@ export enum Env {
 
 export default class CurrentEnv {
     static env(): Env {
-        switch (process.env.ENV) {
+        switch ("DEV") {
             case "DEV": {
                 return Env.DEV
             }
-            case "PROD": {
-                return Env.PROD
-            }
+            // case "PROD": {
+            //     return Env.PROD
+            // }
             default: {
                 throw new Error("Unknown env")
             }

@@ -12,8 +12,8 @@ export class ErrorReasons {
     static EMAIL_NOT_SEND_400 = "Email not send"
     static PASSWORD_NOT_SEND_400 = "Password not send"
     static FIRSTNAME_NOT_SEND_400 = "Firstname not send"
-    static BIRTHDATE_NOT_SEND_400 = "birthDate not send"
-    static TITLE_NOT_SEND_400 = "TItle not send"
+    static BIRTHDATE_NOT_SEND_400 = "BirthDate not send"
+    static TITLE_NOT_SEND_400 = "Title not send"
     static DESCRIPTION_NOT_SEND_400 = "Description not send"
     static ISCOMPLITED_NOT_SEND_400 = "IsComplited not send"
     static FAVOURITE_NOT_SEND_400 = "Favourite not send"
@@ -38,7 +38,7 @@ export class StatusCode {
 
 export class UrlConst {
     // static LOCALHOST_MASK: string = `localhost`;
-    static DEV_PORT = 5000;
+    static DEV_PORT = 3000;
     static PROD_PORT = 3000
     static HEADER_ACCESS_TOKEN = 'Authorization';
 }

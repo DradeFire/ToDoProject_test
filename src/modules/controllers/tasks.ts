@@ -82,7 +82,7 @@ export const getAll = async (req: TaskRequest, res: Response) => {
     taskList[index] = tmp!;
   });
 
-  res.json({ taskList });
+  res.json(taskList);
 };
 
 export const getById = async (req: TaskRequest, res: Response) => {
@@ -150,14 +150,14 @@ export const getTaskUserList = async (req: TaskRequest, res: Response) => {
 
 export const getTaskInviteLink = async (req: TaskRequest, res: Response) => {
   if (!req.params.id) {
-    throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
+    throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
   }
 
   await checkGroupRole(req.params.id, req.user.id, "read-write");
 
   const linkModel = await InviteLink_Task.findByPk(req.params.id);
   if (!linkModel) {
-    throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
+    throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
   }
 
   const link = linkModel.link;
@@ -167,7 +167,7 @@ export const getTaskInviteLink = async (req: TaskRequest, res: Response) => {
 
 export const updateTaskInviteLink = async (req: ChangeLinkRequest, res: Response) => {
   if (!req.params.id) {
-    throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
+    throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
   }
   if (!req.body.isEnabled) {
     throw new ErrorResponse(ErrorReasons.LINK_DATA_NOT_VALID_400, StatusCode.BAD_REQUEST_400);

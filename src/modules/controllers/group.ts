@@ -111,7 +111,7 @@ export const deleteGroup = async (req: ToDoGroupRequest, res: Response) => {
 
 export const addToFavouriteList = async (req: ToDoGroupRequest, res: Response) => {
     if (!req.params.id) {
-        throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
+        throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
     }
 
     await checkOwner(req.user.id, req.params.id);

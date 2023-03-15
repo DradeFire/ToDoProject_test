@@ -90,7 +90,7 @@ export const deleteUser = async (req: RoleGroupRequest, res: Response) => {
 }
 
 export const leaveGroup = async (req: RoleGroupRequest, res: Response) => {
-    if (!req.body.id) {
+    if (!req.params.id) {
         throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
     }
 
