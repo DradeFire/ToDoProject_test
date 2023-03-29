@@ -13,6 +13,7 @@
   "dependencies": {
     "bcryptjs": "2.4.3",
     "body-parser": "^1.20.2",
+    "class-validator": "^0.14.0",
     "cls-hooked": "^4.2.2",
     "cors": "^2.8.5",
     "ejs": "^3.1.8",

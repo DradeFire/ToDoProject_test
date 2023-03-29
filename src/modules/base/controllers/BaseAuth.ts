@@ -1,6 +1,6 @@
 import User from "../../../database/model/final/User.model"
 import { ErrorResponse } from "../../../middleware/custom-error";
-import { ErrorReasons, StatusCode } from "../../../utils/constants";
+import { StatusCode } from "../../../utils/constants";
 
 export async function getAndCheckAuthCandidate(email: string): Promise<User> {
     const candidate = await User.findOne({
@@ -9,7 +9,7 @@ export async function getAndCheckAuthCandidate(email: string): Promise<User> {
         }
     });
     if (!candidate) {
-        throw new ErrorResponse(ErrorReasons.INCORRECT_LOGIN_400, StatusCode.BAD_REQUEST_400);
+        throw new ErrorResponse("INCORRECT_LOGIN", StatusCode.BAD_REQUEST_400);
     }
 
     return candidate
@@ -23,6 +23,6 @@ export async function checkExistCandidate(email: string) {
     });
 
     if (candidate) {
-        throw new ErrorResponse(ErrorReasons.USER_EMAIL_EXIST_400, StatusCode.BAD_REQUEST_400);
+        throw new ErrorResponse("USER_EMAIL_EXIST", StatusCode.BAD_REQUEST_400);
     }
 }

@@ -2,8 +2,7 @@ import jwt from 'jsonwebtoken';
 import ToDoGroup from '../../../database/model/final/ToDoGroup.model';
 import MMUserToDoGroup from '../../../database/model/relations/MMUserToDoGroup.model';
 import { ErrorResponse } from '../../../middleware/custom-error';
-import { ErrorReasons, JWT_SECRET, StatusCode } from '../../../utils/constants';
-import { getCurrentPort } from '../../../utils/env_config';
+import { JWT_SECRET, StatusCode } from '../../../utils/constants';
 
 export function getAndCreateGroupInviteLink(groupId: number, role: string): string {
     const secret = JWT_SECRET
@@ -12,7 +11,7 @@ export function getAndCreateGroupInviteLink(groupId: number, role: string): stri
         role: role
     }
     const token = jwt.sign(payload, secret)
-    return `http://localhost:${getCurrentPort()}/api/group/invite/${token}`
+    return `http://localhost:${process.env.PORT as string | undefined}/api/group/invite/${token}`
 }
 
 export async function checkRoleIsValid(role: string | undefined) {
@@ -21,7 +20,7 @@ export async function checkRoleIsValid(role: string | undefined) {
         case "read-write":
             break;
         default:
-            throw new ErrorResponse(ErrorReasons.UNKNOWN_ROLE_400, StatusCode.BAD_REQUEST_400);
+            throw new ErrorResponse("UNKNOWN_ROLE", StatusCode.BAD_REQUEST_400);
     }
 }
 
@@ -34,7 +33,7 @@ export async function checkOwner(userId: number, groupId: number) {
     })
 
     if (!isUserOwner) {
-        throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
+        throw new ErrorResponse("TOKEN_INCORRECT", StatusCode.UNAUTHORIZED_403);
     }
 }
 
@@ -48,7 +47,7 @@ export async function checkOwnerWithRole(userId: number, taskId: number, role: s
     })
 
     if (!isUserOwner) {
-        throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
+        throw new ErrorResponse("TOKEN_INCORRECT", StatusCode.UNAUTHORIZED_403);
     }
 }
 
@@ -56,7 +55,7 @@ export async function getGroupById(groupId: number): Promise<ToDoGroup> {
     const group = await ToDoGroup.findByPk(groupId);
 
     if (!group) {
-        throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
+        throw new ErrorResponse("TASK_NOT_FOUND", StatusCode.NOT_FOUND_404);
     }
 
     return group!
@@ -72,6 +71,6 @@ export async function checkGroupRole(groupId: number, userId: number, role: stri
     });
 
     if (!groupIDElement) {
-        throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
+        throw new ErrorResponse("TOKEN_INCORRECT", StatusCode.UNAUTHORIZED_403);
     }
 }

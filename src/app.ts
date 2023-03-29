@@ -2,10 +2,7 @@ import express, { Application } from "express";
 import { authRoutes } from "./routers/auth";
 import { taskRoutes } from "./routers/tasks";
 import { initDB } from "./database/db/db";
-import { Env } from "./utils/env_config";
-import { UrlConst } from "./utils/constants";
 import groupRoutes from "./routers/group";
-import cors from "cors";
 import { profileRoutes } from "./routers/profile";
 import { notFound } from "./middleware/notFoundHandler";
 import { errorHandler } from "./middleware/errorHandler";
@@ -18,23 +15,13 @@ export default class App {
   private app: Application;
   private port: number
 
-  constructor(env: Env) {
+  constructor() {
     this.app = express();
-
-    switch (env) {
-      case Env.DEV: {
-        this.port = UrlConst.DEV_PORT;
-        break;
-      }
-      case Env.PROD: {
-        this.port = UrlConst.PROD_PORT;
-        break;
-      }
-    }
+    this.port = parseInt(process.env.PORT!)
   }
 
-  static async create(env: Env): Promise<App> {
-    const app = new App(env);
+  static async create(): Promise<App> {
+    const app = new App();
 
     await initDB();
     app.initUtils()

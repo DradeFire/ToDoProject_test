@@ -1,22 +1,21 @@
 import bcrypt from "bcryptjs";
 import { Response } from 'express';
-import { UserRequest, ChangePassRequest, RecoverPassRequest } from '../models/models';
-import { ErrorReasons, JWT_SECRET, OkMessage, StatusCode, Transporter } from "../../utils/constants";
+import { JWT_SECRET, OkMessage, StatusCode, Transporter } from "../../utils/constants";
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
 import { ErrorResponse } from "../../middleware/custom-error";
 import User from "../../database/model/final/User.model";
-import { getCurrentPort } from "../../utils/env_config";
-import { PayloadResetPass } from "../dto/models";
+import { ChangePassModelDto, PayloadResetPassDto, RecoverPassModelDto, UserModelDto } from "../dto/models";
+import { BaseRequest } from "../base/models/BaseModels";
 
-export const resetPassword = async (req: UserRequest, res: Response) => {
+export const resetPassword = async (req: BaseRequest, res: Response) => {
     const { email, token } = req.params;
 
     const secret = JWT_SECRET + req.body.email
     const payload = jwt.verify(token, secret)
 
-    if ((payload as PayloadResetPass).email as string !== email) {
-        throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
+    if ((payload as PayloadResetPassDto).email as string !== email) {
+        throw new ErrorResponse("TOKEN_INCORRECT", StatusCode.UNAUTHORIZED_403);
     }
 
     const candidate = await User.findOne({
@@ -25,7 +24,7 @@ export const resetPassword = async (req: UserRequest, res: Response) => {
         }
     });
     if (!candidate) {
-        throw new ErrorResponse(ErrorReasons.INCORRECT_LOGIN_400, StatusCode.BAD_REQUEST_400);
+        throw new ErrorResponse("INCORRECT_LOGIN", StatusCode.BAD_REQUEST_400);
     }
 
     res.render('reset-password', {
@@ -33,21 +32,16 @@ export const resetPassword = async (req: UserRequest, res: Response) => {
     })
 };
 
-export const resetPassSendMail = async (req: UserRequest, res: Response) => {
-    if (!req.body.email) {
-        throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-    }
-    if (!req.body.firstName) {
-        throw new ErrorResponse(ErrorReasons.FIRSTNAME_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-    }
+export const resetPassSendMail = async (req: BaseRequest, res: Response) => {
+    const dto: UserModelDto = req.body
 
-    const secret = JWT_SECRET + req.body.email
+    const secret = JWT_SECRET + dto.email
     const payload = {
-        email: req.body.email,
-        firstName: req.body.firstName
+        email: dto.email,
+        firstName: dto.firstName
     }
     const token = jwt.sign(payload, secret, { expiresIn: '5m' })
-    const link = `http://localhost:${getCurrentPort()}/api/auth/reset-password/${req.body.email}/${token}`
+    const link = `http://localhost:${process.env.PORT}/api/auth/reset-password/${dto.email}/${token}`
 
 
     const transporter = nodemailer.createTransport({
@@ -63,7 +57,7 @@ export const resetPassSendMail = async (req: UserRequest, res: Response) => {
     });
 
     await transporter.sendMail({
-        to: `User <${req.body.email}>`, // list of receivers
+        to: `User <${dto.email}>`, // list of receivers
         subject: "Recover password", // Subject line
         text: link, // plain text body
         html: '<p><b>Hello</b> to myself!</p>'
@@ -74,35 +68,27 @@ export const resetPassSendMail = async (req: UserRequest, res: Response) => {
     });
 };
 
-export const recoverPass = async (req: RecoverPassRequest, res: Response) => {
-    if (!req.body.email) {
-        throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-    }
-    if (!req.body.password) {
-        throw new ErrorResponse(ErrorReasons.PASSWORD_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-    }
-    if (!req.body.againPassword) {
-        throw new ErrorResponse(ErrorReasons.PASSWORD_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-    }
+export const recoverPass = async (req: BaseRequest, res: Response) => {
+    const dto: RecoverPassModelDto = req.body
 
-    if (req.body.password !== req.body.againPassword) {
-        throw new ErrorResponse(ErrorReasons.PASSWORDS_NOT_EQUAL_400, StatusCode.BAD_REQUEST_400)
+    if (dto.password !== dto.againPassword) {
+        throw new ErrorResponse("PASSWORDS_NOT_EQUAL", StatusCode.BAD_REQUEST_400)
     }
 
     const candidate = await User.findOne({
         where: {
-            email: req.body.email
+            email: dto.email
         }
     });
 
     const salt = bcrypt.genSaltSync(10);
     await candidate?.update(
         {
-            pass: bcrypt.hashSync(req.body.password, salt),
+            pass: bcrypt.hashSync(dto.password, salt),
         },
         {
             where: {
-                email: req.body.email,
+                email: dto.email,
             },
         }
     );
@@ -110,20 +96,15 @@ export const recoverPass = async (req: RecoverPassRequest, res: Response) => {
     res.json(OkMessage);
 };
 
-export const changePassword = async (req: ChangePassRequest, res: Response) => {
-    if (!req.body.lastPassword) {
-        throw new ErrorResponse(ErrorReasons.PASSWORD_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-    }
-    if (!req.body.newPassword) {
-        throw new ErrorResponse(ErrorReasons.PASSWORD_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-    }
+export const changePassword = async (req: BaseRequest, res: Response) => {
+    const dto: ChangePassModelDto = req.body
 
-    const lastPassword = req.body.lastPassword;
-    const newPassword = req.body.newPassword;
+    const lastPassword = dto.lastPassword;
+    const newPassword = dto.newPassword;
 
     const passwordResult = bcrypt.compareSync(lastPassword, req.user.pass);
     if (!passwordResult) {
-        throw new ErrorResponse(ErrorReasons.INCORRECT_LAST_PASSWORD_400, StatusCode.BAD_REQUEST_400);
+        throw new ErrorResponse("INCORRECT_LAST_PASSWORD", StatusCode.BAD_REQUEST_400);
     }
 
     const salt = bcrypt.genSaltSync(10);

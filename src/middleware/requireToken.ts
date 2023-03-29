@@ -1,11 +1,11 @@
 import { NextFunction } from "express";
 import Token from "../database/model/final/Token.model";
 import User from "../database/model/final/User.model";
-import { RequestWithToken } from "../modules/base/models/BaseModels";
+import { BaseRequest } from "../modules/base/models/BaseModels";
 import { ErrorReasons, StatusCode, UrlConst } from "../utils/constants";
 import { ErrorResponse } from "./custom-error";
 
-export const requireToken = async <K, T extends RequestWithToken<K>>(req: T, _res: Response, next: NextFunction) => {
+export const requireToken = async <K, T extends BaseRequest<K>>(req: T, _res: Response, next: NextFunction) => {
     const token = req.header(UrlConst.HEADER_ACCESS_TOKEN);
     if (!token) {
         throw new ErrorResponse(ErrorReasons.NO_TOKEN_SEND_403, StatusCode.UNAUTHORIZED_403);

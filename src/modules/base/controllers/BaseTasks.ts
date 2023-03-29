@@ -2,8 +2,7 @@ import jwt from 'jsonwebtoken';
 import Task from '../../../database/model/final/Task.model';
 import MMUserToDo from '../../../database/model/relations/MMUserToDo.model';
 import { ErrorResponse } from '../../../middleware/custom-error';
-import { ErrorReasons, JWT_SECRET, StatusCode } from '../../../utils/constants';
-import { getCurrentPort } from '../../../utils/env_config';
+import { JWT_SECRET, StatusCode } from '../../../utils/constants';
 
 export function getAndCreateTaskInviteLink(taskId: number, role: string): string {
     const secret = JWT_SECRET + taskId
@@ -12,7 +11,7 @@ export function getAndCreateTaskInviteLink(taskId: number, role: string): string
         role: role
     }
     const token = jwt.sign(payload, secret)
-    return `http://localhost:${getCurrentPort()}/api/task/invite/${token}`
+    return `http://localhost:${process.env.PORT}/api/task/invite/${token}`
 }
 
 export async function checkRole(role: string | undefined) {
@@ -21,7 +20,7 @@ export async function checkRole(role: string | undefined) {
         case "read-write":
             break;
         default:
-            throw new ErrorResponse(ErrorReasons.UNKNOWN_ROLE_400, StatusCode.BAD_REQUEST_400);
+            throw new ErrorResponse("UNKNOWN_ROLE", StatusCode.BAD_REQUEST_400);
     }
 }
 
@@ -34,7 +33,7 @@ export async function checkOwner(userId: number, taskId: number) {
     })
 
     if (!isUserOwner) {
-        throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
+        throw new ErrorResponse("TOKEN_INCORRECT", StatusCode.UNAUTHORIZED_403);
     }
 }
 
@@ -48,7 +47,7 @@ export async function checkOwnerWithRole(userId: number, taskId: number, role: s
     })
 
     if (!isUserOwner) {
-        throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
+        throw new ErrorResponse("TOKEN_INCORRECT", StatusCode.UNAUTHORIZED_403);
     }
 }
 
@@ -60,7 +59,7 @@ export async function getTaskById(taskId: number): Promise<Task> {
     });
 
     if (!task) {
-        throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
+        throw new ErrorResponse("TASK_NOT_FOUND", StatusCode.NOT_FOUND_404);
     }
 
     return task!
@@ -76,6 +75,6 @@ export async function checkGroupRole(groupId: number, userId: number, role: stri
     });
 
     if (!groupIDElement) {
-        throw new ErrorResponse(ErrorReasons.TOKEN_INCORRECT_403, StatusCode.UNAUTHORIZED_403);
+        throw new ErrorResponse("TOKEN_INCORRECT", StatusCode.UNAUTHORIZED_403);
     }
 }

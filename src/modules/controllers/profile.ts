@@ -3,27 +3,22 @@ import Task from "../../database/model/final/Task.model";
 import MMToDoToDoGroup from "../../database/model/relations/MMToDoToDoGroup.model";
 import MMUserToDo from "../../database/model/relations/MMUserToDo.model";
 import MMUserToDoGroup from "../../database/model/relations/MMUserToDoGroup.model";
-import { ErrorResponse } from "../../middleware/custom-error";
-import { ErrorReasons, OkMessage, StatusCode } from "../../utils/constants";
-import { UserRequest } from "../models/models";
+import { OkMessage } from "../../utils/constants";
+import { BaseRequest } from "../base/models/BaseModels";
+import { UserModelDto } from "../dto/models";
 
-export const updateProfile = async (req: UserRequest, res: Response) => {
-    if (!req.body.firstName) {
-        throw new ErrorResponse(ErrorReasons.FIRSTNAME_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-    }
-    if (!req.body.birthDate) {
-        throw new ErrorResponse(ErrorReasons.BIRTHDATE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-    }
+export const updateProfile = async (req: BaseRequest, res: Response) => {
+    const dto: UserModelDto = req.body
 
     await req.user.update({
-        birthDate: req.body.birthDate,
-        firstName: req.body.firstName
+        birthDate: dto.birthDate,
+        firstName: dto.firstName
     });
 
     res.json(req.user.toJSON());
 }
 
-export const deleteProfile = async (req: UserRequest, res: Response) => {
+export const deleteProfile = async (req: BaseRequest, res: Response) => {
     const groupIdList = await MMUserToDoGroup.findAll({
         where: {
             userId: req.user.id,
