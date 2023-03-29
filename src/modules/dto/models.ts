@@ -1,68 +1,94 @@
-export class UserModel {
-    email: string | undefined
-    pass: string | undefined
-    firstName: string | undefined
-    birthDate: string | undefined
-}
+import { IsString, IsBoolean, IsNumber} from "class-validator"
 
-export class ToDoModel {
-    title: string | undefined
-    description: string | undefined
-    isCompleted: boolean | undefined
-}
-
-export class TokenModel {
-    userEmail: string | undefined
-    value: string | undefined
-}
-
-export class ChangePassModel {
-    lastPassword: string | undefined
-    newPassword: string | undefined
-}
-
-export class RecoverPassModel {
-    email: string | undefined
-    password: string | undefined
-    againPassword: string | undefined
-}
-
-export class IdParamModel {
+export class UserModelDto {
+    @IsString()
     email!: string
+    @IsString()
+    pass!: string
+    @IsString()
+    firstName!: string
+    @IsString()
+    birthDate!: string
+}
+
+export class ToDoModelDto {
+    @IsString()
+    title!: string
+    @IsString()
+    description!: string
+    @IsBoolean()
+    isCompleted!: boolean
+}
+
+export class TokenModelDto {
+    @IsString()
+    userEmail!: string 
+    @IsString()
+    value!: string
+}
+
+export class ChangePassModelDto {
+    @IsString()
+    lastPassword!: string
+    @IsString()
+    newPassword!: string
+}
+
+export class RecoverPassModelDto {
+    @IsString()
+    email!: string
+    @IsString()
+    password!: string
+    @IsString()
+    againPassword!: string
+}
+
+export class RoleGroupModelDto {
+    @IsNumber()
     id!: number
-    token!: string
+    @IsString()
+    userEmail!: string
+    @IsString()
+    groupTitle!: string
+    @IsString()
+    role!: string
 }
 
-export class RoleGroupModel {
-    id: number | undefined
-    userEmail: string | undefined
-    groupTitle: string | undefined
-    role: string | undefined
+export class ToDoGroupModelDto {
+    @IsNumber()
+    groupId!: number
+    @IsString()
+    title!: string
+    @IsString()
+    description!: string
+    @IsString()
+    ownerEmail!: string
 }
 
-export class ToDoGroupModel {
-    groupId: number | undefined
-    title: string | undefined
-    description: string | undefined
-    ownerEmail: string | undefined
+export class ChangeLinkModelDto {
+    @IsString()
+    role!: string 
+    @IsBoolean()
+    isEnabled!: boolean 
 }
 
-export class ChangeLinkModel {
-    role: string | undefined
-    isEnabled: boolean | undefined
-}
-
-export class PayloadTaskLink {
+export class PayloadTaskLinkDto {
+    @IsString()
     taskId!: string
+    @IsString()
     role!: string
 }
 
-export class PayloadGroupLink {
+export class PayloadGroupLinkDto {
+    @IsString()
     groupId!: string
+    @IsString()
     role!: string
 }
 
-export class PayloadResetPass {
+export class PayloadResetPassDto {
+    @IsString()
     email!: string
+    @IsString()
     firstName!: string
 }

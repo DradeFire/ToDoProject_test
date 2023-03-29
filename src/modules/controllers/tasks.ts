@@ -1,6 +1,5 @@
 import { Response } from 'express';
-import { ChangeLinkRequest, TaskRequest } from '../models/models';
-import { ErrorReasons, JWT_SECRET, OkMessage, StatusCode } from '../../utils/constants'
+import { JWT_SECRET, OkMessage, StatusCode } from '../../utils/constants'
 import { ErrorResponse } from "../../middleware/custom-error";
 import Task from '../../database/model/final/Task.model';
 import MMUserFavouriteToDo from '../../database/model/relations/MMUserFavouriteToDo.model';
@@ -8,23 +7,16 @@ import MMUserToDo from '../../database/model/relations/MMUserToDo.model';
 import InviteLink_Task from '../../database/model/final/InviteLink_Task.model';
 import { checkGroupRole, checkOwner, checkOwnerWithRole, checkRole, getAndCreateTaskInviteLink, getTaskById } from '../base/controllers/BaseTasks';
 import jwt from 'jsonwebtoken';
-import { PayloadTaskLink } from '../dto/models';
+import { ChangeLinkModelDto, PayloadTaskLinkDto, ToDoModelDto } from '../dto/models';
+import { BaseRequest } from '../base/models/BaseModels';
 
-export const create = async (req: TaskRequest, res: Response) => {
-  if (!req.body.title) {
-    throw new ErrorResponse(ErrorReasons.TITLE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
-  if (!req.body.description) {
-    throw new ErrorResponse(ErrorReasons.DESCRIPTION_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
-  if (!req.body.isCompleted) {
-    throw new ErrorResponse(ErrorReasons.ISCOMPLITED_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
+export const create = async (req: BaseRequest, res: Response) => {
+  const dto: ToDoModelDto = req.body
 
   const task = await Task.create({
-    title: req.body.title,
-    description: req.body.description,
-    isCompleted: req.body.isCompleted,
+    title: dto.title,
+    description: dto.description,
+    isCompleted: dto.isCompleted,
   });
 
   await MMUserToDo.create({
@@ -44,31 +36,24 @@ export const create = async (req: TaskRequest, res: Response) => {
   res.json(task.toJSON());
 };
 
-export const update = async (req: TaskRequest, res: Response) => {
-  if (!req.body.title) {
-    throw new ErrorResponse(ErrorReasons.TITLE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
-  if (!req.body.description) {
-    throw new ErrorResponse(ErrorReasons.DESCRIPTION_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
-  if (!req.body.isCompleted) {
-    throw new ErrorResponse(ErrorReasons.ISCOMPLITED_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
+export const update = async (req: BaseRequest, res: Response) => {
+  const dto: ToDoModelDto = req.body
+  const id = Number(req.params.id)
 
-  const task = await getTaskById(req.params.id);
+  const task = await getTaskById(id);
 
   await checkOwnerWithRole(req.user.id, task.id, "read-write")
 
   await task.update({
-    title: req.body.title,
-    description: req.body.description,
-    isCompleted: req.body.isCompleted,
+    title: dto.title,
+    description: dto.description,
+    isCompleted: dto.isCompleted,
   });
 
   res.json(OkMessage);
 };
 
-export const getAll = async (req: TaskRequest, res: Response) => {
+export const getAll = async (req: BaseRequest, res: Response) => {
   const idList = await MMUserToDo.findAll({
     where: {
       userId: req.user.id
@@ -82,25 +67,27 @@ export const getAll = async (req: TaskRequest, res: Response) => {
     taskList[index] = tmp!;
   });
 
-  res.json({ taskList });
+  res.json(taskList);
 };
 
-export const getById = async (req: TaskRequest, res: Response) => {
-  const task = await getTaskById(req.params.id)
+export const getById = async (req: BaseRequest, res: Response) => {
+  const task = await getTaskById(Number(req.params.id))
   res.json(task);
 };
 
-export const deleteById = async (req: TaskRequest, res: Response) => {
-  const task = await getTaskById(req.params.id)
+export const deleteById = async (req: BaseRequest, res: Response) => {
+  const id = Number(req.params.id)
 
-  await checkOwnerWithRole(req.user.id, req.params.id, "read-write")
+  const task = await getTaskById(id)
+
+  await checkOwnerWithRole(req.user.id, id, "read-write")
 
   await task.destroy();
 
   res.json(OkMessage);
 };
 
-export const deleteAll = async (req: TaskRequest, res: Response) => {
+export const deleteAll = async (req: BaseRequest, res: Response) => {
   const idList = await MMUserToDo.findAll({
     where: {
       userId: req.user.id
@@ -115,31 +102,27 @@ export const deleteAll = async (req: TaskRequest, res: Response) => {
   res.json(OkMessage);
 };
 
-export const addToFavouriteList = async (req: TaskRequest, res: Response) => {
-  if (!req.params.id) {
-    throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
-  }
+export const addToFavouriteList = async (req: BaseRequest, res: Response) => {
+  const id = Number(req.params.id)
 
-  await checkOwner(req.user.id, req.params.id);
+  await checkOwner(req.user.id, id);
 
   await MMUserFavouriteToDo.create({
     userId: req.user.id,
-    taskId: req.params.id
+    taskId: id
   })
 
   res.json(OkMessage);
 }
 
-export const getTaskUserList = async (req: TaskRequest, res: Response) => {
-  if (!req.params.id) {
-    throw new ErrorResponse(ErrorReasons.TASK_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
-  }
+export const getTaskUserList = async (req: BaseRequest, res: Response) => {
+  const id = Number(req.params.id)
 
-  await checkOwner(req.user.id, req.params.id);
+  await checkOwner(req.user.id, id);
 
   const userList = await MMUserToDo.findAll({
     where: {
-      taskId: req.params.id
+      taskId: id
     }
   })
 
@@ -148,16 +131,14 @@ export const getTaskUserList = async (req: TaskRequest, res: Response) => {
   res.json({ userList });
 }
 
-export const getTaskInviteLink = async (req: TaskRequest, res: Response) => {
-  if (!req.params.id) {
-    throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
-  }
+export const getTaskInviteLink = async (req: BaseRequest, res: Response) => {
+  const id = Number(req.params.id)
 
-  await checkGroupRole(req.params.id, req.user.id, "read-write");
+  await checkGroupRole(id, req.user.id, "read-write");
 
-  const linkModel = await InviteLink_Task.findByPk(req.params.id);
+  const linkModel = await InviteLink_Task.findByPk(id);
   if (!linkModel) {
-    throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
+    throw new ErrorResponse("TASK_NOT_FOUND", StatusCode.NOT_FOUND_404);
   }
 
   const link = linkModel.link;
@@ -165,24 +146,20 @@ export const getTaskInviteLink = async (req: TaskRequest, res: Response) => {
   res.json({ link: link });
 }
 
-export const updateTaskInviteLink = async (req: ChangeLinkRequest, res: Response) => {
-  if (!req.params.id) {
-    throw new ErrorResponse(ErrorReasons.GROUP_NOT_FOUND_404, StatusCode.NOT_FOUND_404);
-  }
-  if (!req.body.isEnabled) {
-    throw new ErrorResponse(ErrorReasons.LINK_DATA_NOT_VALID_400, StatusCode.BAD_REQUEST_400);
-  }
+export const updateTaskInviteLink = async (req: BaseRequest, res: Response) => {
+  const dto: ChangeLinkModelDto = req.body
+  const id = Number(req.params.id)
 
-  await checkGroupRole(req.params.id, req.user.id, "read-write");
+  await checkGroupRole(id, req.user.id, "read-write");
 
-  await checkRole(req.body.role)
+  await checkRole(dto.role)
 
-  await InviteLink_Task.findByPk(req.params.id)
+  await InviteLink_Task.findByPk(id)
     .then(async (linkInvite) => {
-      const link = getAndCreateTaskInviteLink(req.params.id, req.body.role!)
+      const link = getAndCreateTaskInviteLink(id, dto.role)
 
       await linkInvite?.update({
-        isEnabled: req.body.isEnabled,
+        isEnabled: dto.isEnabled,
         link: link
       })
     });
@@ -190,14 +167,14 @@ export const updateTaskInviteLink = async (req: ChangeLinkRequest, res: Response
   res.json(OkMessage);
 }
 
-export const inviteHandler = async (req: TaskRequest, res: Response) => {
+export const inviteHandler = async (req: BaseRequest, res: Response) => {
   const secret = JWT_SECRET
   const payload = jwt.verify(req.params.token, secret)
 
   await MMUserToDo.create({
     userId: req.user.id,
-    taskId: (payload as PayloadTaskLink).taskId,
-    role: (payload as PayloadTaskLink).role
+    taskId: (payload as PayloadTaskLinkDto).taskId,
+    role: (payload as PayloadTaskLinkDto).role
   });
 
   res.json(OkMessage);

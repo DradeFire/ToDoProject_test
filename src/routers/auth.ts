@@ -15,7 +15,7 @@ authRoutes.get("/reset-password/:email/:token", asyncHandler(resetPassword)); //
 authRoutes.post("/reset-password-send-mail", asyncHandler(resetPassSendMail)); // Отсылает на почту ссылку-рекавер
 authRoutes.post("/recover-pass", asyncHandler(recoverPass)); // Отправление нового пароля после заполнения формы /forgot-pass
 authRoutes.post("/login", asyncHandler(login));
-authRoutes.post("/logout", asyncHandler(logout));
+authRoutes.post("/logout", asyncHandler(requireToken), asyncHandler(logout));
 authRoutes.post("/registration", asyncHandler(registration));
 authRoutes.patch(
   "/change-password",

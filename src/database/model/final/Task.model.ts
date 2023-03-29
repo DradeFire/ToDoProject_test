@@ -15,7 +15,4 @@ export default class Task extends Model {
 
   @Column
   public isCompleted!: boolean;
-
-  @Column
-  public favourite!: boolean;
 }

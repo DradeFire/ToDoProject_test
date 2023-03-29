@@ -1,30 +1,26 @@
 import { nanoid } from "nanoid";
 import bcrypt from "bcryptjs";
 import { Response } from 'express';
-import { UserRequest } from '../models/models';
-import { ErrorReasons, OkMessage, StatusCode } from "../../utils/constants";
+import { OkMessage, StatusCode } from "../../utils/constants";
 import { ErrorResponse } from "../../middleware/custom-error";
 import User from "../../database/model/final/User.model";
 import Token from "../../database/model/final/Token.model";
 import { checkExistCandidate, getAndCheckAuthCandidate } from "../base/controllers/BaseAuth";
+import { BaseRequest } from "../base/models/BaseModels";
+import { UserModelDto } from "../dto/models";
 
-export const login = async (req: UserRequest, res: Response) => {
-  if (!req.body.email) {
-    throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
-  if (!req.body.pass) {
-    throw new ErrorResponse(ErrorReasons.PASSWORD_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
+export const login = async (req: BaseRequest, res: Response) => {
+  const dto: UserModelDto = req.body
 
   const candidate = await getAndCheckAuthCandidate(req.body.email)
 
   const passwordResult = bcrypt.compareSync(
-    req.body.pass,
+    dto.pass,
     candidate.pass
   );
 
   if (!passwordResult) {
-    throw new ErrorResponse(ErrorReasons.INCORRECT_PASSWORD_400, StatusCode.BAD_REQUEST_400);
+    throw new ErrorResponse("INCORRECT_PASSWORD", StatusCode.BAD_REQUEST_400);
   }
 
   const newToken = await Token.create({
@@ -35,38 +31,27 @@ export const login = async (req: UserRequest, res: Response) => {
   res.json(newToken.toJSON());
 };
 
-export const registration = async (req: UserRequest, res: Response) => {
-  if (!req.body.email) {
-    throw new ErrorResponse(ErrorReasons.EMAIL_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
-  if (!req.body.pass) {
-    throw new ErrorResponse(ErrorReasons.PASSWORD_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
-  if (!req.body.firstName) {
-    throw new ErrorResponse(ErrorReasons.FIRSTNAME_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
-  if (!req.body.birthDate) {
-    throw new ErrorResponse(ErrorReasons.BIRTHDATE_NOT_SEND_400, StatusCode.BAD_REQUEST_400);
-  }
+export const registration = async (req: BaseRequest, res: Response) => {
+  const dto: UserModelDto = req.body
 
-  await checkExistCandidate(req.body.email)
+  await checkExistCandidate(dto.email)
 
-  const hashPassword = bcrypt.hashSync(req.body.pass, bcrypt.genSaltSync(10));
+  const hashPassword = bcrypt.hashSync(dto.pass, bcrypt.genSaltSync(10));
   const user = await User.create({
-    email: req.body.email,
+    email: dto.email,
     pass: hashPassword,
-    firstName: req.body.firstName,
-    birthDate: req.body.birthDate
+    firstName: dto.firstName,
+    birthDate: dto.birthDate
   });
 
   res.json(user.toJSON());
 };
 
-export const logout = async (req: UserRequest, res: Response) => {
+export const logout = async (req: BaseRequest, res: Response) => {
   await req.token.destroy();
   res.json(OkMessage);
 };
 
-export const me = async (req: UserRequest, res: Response) => {
+export const me = async (req: BaseRequest, res: Response) => {
   res.json(req.user.toJSON());
 };

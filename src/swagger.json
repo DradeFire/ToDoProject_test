@@ -1,0 +1,1670 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+      "version": "1.0.0",
+      "title": "Swagger Petstore - OpenAPI 3.0"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000/api"
+      }
+    ],
+    "tags": [
+      {
+        "name": "auth",
+        "description": "123"
+      },
+      {
+        "name": "group",
+        "description": "123"
+      },
+      {
+        "name": "profile",
+        "description": "123"
+      },
+      {
+        "name": "tasks",
+        "description": "123"
+      }
+    ],
+    "paths": {
+      "/auth/me": {
+        "get": {
+          "tags": [
+            "auth"
+          ],
+          "summary": "Get info about himself",
+          "description": "get profile-info",
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/reset-password/{email}/{token}": {
+        "get": {
+          "tags": [
+            "auth"
+          ],
+          "summary": "Reset password",
+          "description": "get html-page with reset-password process",
+          "parameters": [
+            {
+              "name": "email",
+              "in": "path",
+              "description": "User email",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "token",
+              "in": "path",
+              "description": "Auth token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "HTLM-page \\\"reset password\\\""
+            },
+            "400": {
+              "description": "Incorrect login",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/reset-password-send-mail": {
+        "post": {
+          "tags": [
+            "auth"
+          ],
+          "summary": "Send mail to reset password",
+          "description": "send mail from mail.ru smtp server to some email with recover link",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "HTLM-page \\\"reset password\\\""
+            },
+            "400": {
+              "description": "Email not send | Firstname not send",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/login": {
+        "post": {
+          "tags": [
+            "auth"
+          ],
+          "summary": "Sign in",
+          "description": "Sign in user profile and get auth-token",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Token"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Email not send | Password not send",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/registration": {
+        "post": {
+          "tags": [
+            "auth"
+          ],
+          "summary": "Sign up",
+          "description": "Registrate and create user profile",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Email not send | Password not send | Firstname not send | BirthDate not send",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/logout": {
+        "post": {
+          "tags": [
+            "auth"
+          ],
+          "summary": "Logout",
+          "description": "logout and reset token",
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/change-password": {
+        "patch": {
+          "tags": [
+            "auth"
+          ],
+          "summary": "Change password",
+          "description": "Change user password by new pass",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangePass"
+                }
+              }
+            },
+            "required": true
+          },
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Password not send",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/group/user-list/{id}": {
+        "get": {
+          "tags": [
+            "group"
+          ],
+          "summary": "Get users from group by groupId",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "Group Id",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            },
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Group not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/group/invite/{token}": {
+        "get": {
+          "tags": [
+            "group"
+          ],
+          "summary": "Get users from group by groupId",
+          "parameters": [
+            {
+              "name": "token",
+              "in": "path",
+              "description": "JWT invite-link",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/group": {
+        "post": {
+          "tags": [
+            "group"
+          ],
+          "summary": "Create group",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToDoGroup"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ToDoGroup"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Title not send | Description not send | Group with this title exist",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "patch": {
+          "tags": [
+            "group"
+          ],
+          "summary": "Update group",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToDoGroup"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "group"
+          ],
+          "summary": "Delete group",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToDoGroup"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Group not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/group/user": {
+        "post": {
+          "tags": [
+            "group"
+          ],
+          "summary": "Add user to group",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleGroup"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Title not send | Description not send | Role not send | User with this email exist | Unknown role. Use \\\"read-only\\\" or \\\"read-write\\\"",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "patch": {
+          "tags": [
+            "group"
+          ],
+          "summary": "Update user group role",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleGroup"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Title not send | Description not send | Role not send | User with this email exist | Unknown role. Use \\\"read-only\\\" or \\\"read-write\\\"",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "group"
+          ],
+          "summary": "Delete user from group",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleGroup"
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Group not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/group/favourite/{id}": {
+        "post": {
+          "tags": [
+            "group"
+          ],
+          "summary": "Add group o favourite list",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "Group Id",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            },
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Group not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/group/user/me/{id}": {
+        "delete": {
+          "tags": [
+            "group"
+          ],
+          "summary": "Delete user by himself",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "Group Id",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            },
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Group not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/profile": {
+        "patch": {
+          "tags": [
+            "profile"
+          ],
+          "summary": "Update profite",
+          "description": "update profile info",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "required": true
+          },
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Firstname not send | BirthDate not send",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "profile"
+          ],
+          "summary": "Delete profile",
+          "description": "delete profile with all tasks and groups",
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/tasks": {
+        "get": {
+          "tags": [
+            "task"
+          ],
+          "summary": "Get all tasks",
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ToDo"
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "task"
+          ],
+          "summary": "Create new ToDo",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToDo"
+                }
+              }
+            },
+            "required": true
+          },
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ToDo"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Title not send | Description not send | IsComplited not send",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "task"
+          ],
+          "summary": "Delete all tasks",
+          "parameters": [
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/tasks/{id}": {
+        "get": {
+          "tags": [
+            "task"
+          ],
+          "summary": "Get task by id",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "Task id",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            },
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ToDo"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Task not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "patch": {
+          "tags": [
+            "task"
+          ],
+          "summary": "Update task by id",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToDo"
+                }
+              }
+            },
+            "required": true
+          },
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "Task id",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            },
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Title not send | Description not send | IsComplited not send",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Task not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "task"
+          ],
+          "summary": "Delete task by id",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "Task id",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            },
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Task not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/tasks/user-list/{id}": {
+        "get": {
+          "tags": [
+            "task"
+          ],
+          "summary": "Get users with some tasl by id",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "Task id",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            },
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Task not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/tasks/invite/{token}": {
+        "get": {
+          "tags": [
+            "task"
+          ],
+          "summary": "Follow to invite link",
+          "parameters": [
+            {
+              "name": "token",
+              "in": "path",
+              "description": "JWT task link",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/tasks/favourite/{id}": {
+        "post": {
+          "tags": [
+            "task"
+          ],
+          "summary": "Follow to invite link",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "Task id",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            },
+            {
+              "name": "Token",
+              "in": "header",
+              "description": "Authorization token",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Token incorrect",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Task not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/StatusMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "User": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "example": "example@gmail.com"
+            },
+            "pass": {
+              "type": "string",
+              "example": "qwerty123456"
+            },
+            "firstName": {
+              "type": "string",
+              "example": "Alex"
+            },
+            "birthDate": {
+              "type": "string",
+              "example": "1.01.1999"
+            }
+          },
+          "xml": {
+            "name": "user"
+          }
+        },
+        "ToDo": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "example": "NiCe todo, man"
+            },
+            "description": {
+              "type": "string",
+              "example": "some descr\""
+            },
+            "isCompleted": {
+              "type": "boolean",
+              "example": true
+            }
+          },
+          "xml": {
+            "name": "user"
+          }
+        },
+        "Token": {
+          "type": "object",
+          "properties": {
+            "userEmail": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "xml": {
+            "name": "user"
+          }
+        },
+        "ChangePass": {
+          "type": "object",
+          "properties": {
+            "lastPassword": {
+              "type": "string"
+            },
+            "newPassword": {
+              "type": "string"
+            }
+          },
+          "xml": {
+            "name": "user"
+          }
+        },
+        "RecoverPass": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "againPassword": {
+              "type": "string"
+            }
+          },
+          "xml": {
+            "name": "user"
+          }
+        },
+        "RoleGroup": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "userEmail": {
+              "type": "string"
+            },
+            "groupTitle": {
+              "type": "string"
+            },
+            "role": {
+              "type": "string",
+              "enum": [
+                "read-write",
+                "read-only"
+              ]
+            }
+          },
+          "xml": {
+            "name": "user"
+          }
+        },
+        "ToDoGroup": {
+          "type": "object",
+          "properties": {
+            "groupId": {
+              "type": "integer"
+            },
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "ownerEmail": {
+              "type": "string"
+            }
+          },
+          "xml": {
+            "name": "user"
+          }
+        },
+        "ChangeLink": {
+          "type": "object",
+          "properties": {
+            "role": {
+              "type": "string",
+              "enum": [
+                "read-write",
+                "read-only"
+              ]
+            },
+            "isEnabled": {
+              "type": "boolean"
+            }
+          },
+          "xml": {
+            "name": "user"
+          }
+        },
+        "StatusMessage": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string",
+              "example": "Ok"
+            }
+          }
+        }
+      }
+    }
+  }
